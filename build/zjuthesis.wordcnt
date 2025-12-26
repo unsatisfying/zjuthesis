@@ -1,0 +1,4 @@
+\input{./body/graduate/content.tex}
+\input{./body/graduate/post.tex}
+\input{./body/graduate/post/ref.tex}
+\input{./body/graduate/post/appendix.tex}
