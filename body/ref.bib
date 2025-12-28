@@ -175,7 +175,6 @@ number = {4},
 issn = {0098-5589},
 url = {https://doi.org/10.1109/TSE.2022.3191353},
 doi = {10.1109/TSE.2022.3191353},
-abstract = {Managing cross-project dependencies is tricky in modern software development. A primary way to manage dependencies is using dependency configuration files, which brings convenience to the entire software ecosystem, including developers, maintainers, and users. However, developers may introduce dependency smells if dependency configuration files are not well written and maintained. Dependency smells are recurring violations of dependency management in dependency configuration files and can potentially lead to severe consequences. This paper provides an in-depth look at three dependency smells, namely, <italic>Missing Dependency</italic>, <italic>Bloated Dependency</italic>, and <italic>Version Constraint Inconsistency</italic> in Python projects. First, we implement a tool called <underline>Py</underline>thon <underline>C</underline>ross-project <underline>D</underline>ependency- PyCD to accurately extract dependency information from configuration files. The evaluation result on 212 Python projects shows that PyCD outperforms state-of-the-art tools. Then, we make an empirical study for three dependency smells in 132 Python projects to investigate the pervasiveness, causes, and evolution. The results show that: 1) dependency smells are prevalent in Python projects and exist inconsistently in different projects; 2) dependency smells are introduced into Python projects for different reasons, mainly due to the problems of synchronous update and collaborative development; and 3) dependency smells can be removed with different patterns according to different dependency smells. Furthermore, we report and get responses for 40 harmful dependency smell instances, 34 of which have been responded that these dependency smells do exist in the projects, and 10 instances are fixed or under process. The feedback from developers indicates that dependency smells can have a negative impact on project maintenance. Our study highlights that these dependency smells deserve the attention of developers.},
 journal = {IEEE Trans. Softw. Eng.},
 month = apr,
 pages = {1741–1765},
@@ -337,7 +336,7 @@ abstract = {Deep Neural Networks (DNNs) are now presenting human-level performan
 booktitle = {Proceedings of the 36th Annual Computer Security Applications Conference},
 pages = {928–938},
 numpages = {11},
-location = {<conf-loc>, <city>Austin</city>, <country>USA</country>, </conf-loc>},
+location = {Austin, USA},
 series = {ACSAC '20}
 }
 @article{wang2022evilmodel,
@@ -405,4 +404,35 @@ series = {ACSAC '20}
     url = {https://blog.trailofbits.com/2024/06/11/exploiting-ml-models-with-pickle-file-attacks-part-1/},
     note = {Accessed: 2025-12-26},
     publisher = {Trail of Bits}
+}
+
+@www{python3123pickletools,
+title={pickletools — Tools for pickle developers},
+author={{Python Software Foundation}},
+howpublished={\url{https://docs.python.org/3/library/pickletools.html}},
+year={2023},
+note={Accessed: 2024-06-06}
+}
+
+@www{fickling_defcon_2021,
+title        = {Fickling @ DEFCON AI Village 2021},
+author       = {Trail of Bits},
+howpublished = {Online},
+year         = {2021},
+note         = {Available: \url{https://github.com/trailofbits/fickling}}
+}
+@www{picklescan,
+title        = {Python Pickle Malware Scanner},
+author       = {Mmaitre314},
+howpublished = {Online},
+year         = {2024},
+note         = {Available: \url{https://pypi.org/project/picklescan/}}
+}
+@www{modelscan_github_2024,
+author = {protectai},
+title = {ModelScan: Protection against Model Serialization Attacks},
+year = {2024},
+publisher = {GitHub},
+journal = {GitHub repository},
+howpublished = {\url{https://github.com/protectai/modelscan}}
 }
