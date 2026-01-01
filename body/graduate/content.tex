@@ -9,7 +9,7 @@ AI 的广泛应用不仅加速了社会向数字化、信息化与智能化的�
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.85\linewidth]{figure/AI系统架构图.png}
+    \includegraphics[width=0.85\linewidth]{figure/AI系统框架图.png}
     \caption{\label{fig:AI_system}AI系统架构图}
 \end{figure}
 
@@ -55,16 +55,22 @@ Cheng 等人提出了 PyCRE 框架，采用静态分析方法修复 Python 供�
 综上所述，现有研究已从多个角度揭示了模型框架层在 AI 系统供应链中面临的安全风险，充分地证明了模型本身可以被用作攻击载体。然而，这些工作大多将风险归因于恶意模型本身或不安全的序列化机制，从而将模型框架层的安全边界界定在模型层面，这是不完备的，事实上模型框架层自身和为模型框架提供的算子层面的攻击仍未被充分研究。
 
 
-\textbf{AI系统硬件加速层供应链研究现状。 }在硬件加速层，AI 系统高度依赖 GPU 等专用计算设备以满足大规模并行计算与高吞吐推理需求，其底层由 GPU 硬件、设备驱动、运行时库以及 CUDA、OpenCL 等编程框架共同构成。这一层通常被视为“可信的计算基础”，但随着 GPU 架构与软件栈复杂度的持续提升，相关组件逐渐暴露出新的安全风险，使其在 AI 供应链中的角色从单纯的计算加速单元，演变为潜在的攻击入口。
+\textbf{AI系统硬件加速层供应链研究现状。 }在硬件加速层，AI 系统高度依赖 GPU、NPU 等专用计算设备以满足大规模并行计算与高性能推理需求，其底层供应链通常由计算加速硬件、设备驱动、运行时库以及 CUDA、OpenCL 等编程框架共同构成。随着 GPU 架构与配套软件栈复杂度的持续提升，相关供应链组件逐渐暴露出新的安全风险，使得硬件加速层在 AI 系统中不再仅是被动的计算执行单元，而演变为潜在的重要攻击入口。
 
-已有研究主要从 GPU 架构与系统安全的角度，对底层机制进行了系统性分析。在内存隔离与地址随机化方面，ASLR 作为现代系统的重要防护机制，已在 CPU 平台上被广泛研究。相关工作系统分析了 Linux、Windows 及 macOS 等平台上的 ASLR 实现缺陷，揭示了其随机化熵不足、旁路泄漏及错误配置等问题，并提出了多种绕过手段。然而，相较于成熟的软件系统，GPU 侧的地址空间布局与随机化机制长期缺乏公开文档，相关研究极为有限，使得 GPU 在 AI 系统中的实际隔离能力仍不清晰。
+随着 GPU 架构与配套软件栈复杂度的持续提升，相关供应链组件逐渐暴露出新的安全风险，使得硬件加速层在 AI 系统中不再仅是被动的计算执行单元，而演变为潜在的重要攻击入口。Saileshwar 等人首次将 Rowhammer 类硬件攻击扩展至 GPU 平台，提出了 GPUHammer 攻击方法，利用 GPU 的高并行特性在显存中诱发比特翻转，从而显著破坏深度学习模型参数的完整性，甚至仅通过翻转单个模型权重比特即可导致模型准确率出现灾难性下降~\cite{utoronto-gpuhammer}。该工作表明，即便不直接攻击模型代码或框架逻辑，底层硬件的不可靠性本身亦可能成为影响 AI 系统可信性的关键因素。
 
-围绕 GPU 的安全性，现有研究进一步从侧信道攻击与内存漏洞两个方向展开。在侧信道方面，研究者通过对 GPU 缓存层次结构、Tensor Core 以及互连机制的逆向分析，揭示了跨进程甚至跨租户的信息泄漏风险；在内存安全方面，多项工作表明 GPU 内核中同样存在栈溢出、越界访问及未初始化内存使用等问题，可被用于数据泄漏或控制流劫持。这些研究表明，GPU 并非一个天然隔离、可信的执行环境，其底层缺陷可能被攻击者利用，从而影响上层 AI 应用的安全性与可靠性。
+除硬件本体外，围绕 GPU 构建的配套软件同样构成硬件加速层供应链中的重要组成部分，并已被多次证实存在安全隐患。已有公开漏洞表明，NVIDIA GPU 驱动中存在可被利用的高危漏洞，攻击者可借此实现权限提升或非法内存访问~\cite{nvidia-driver-cve-2, nvidia-driver-cve-1, nvidia-driver-cve-3}。与此同时，面向 AI 场景广泛部署的 NVIDIA GPU 容器生态亦被发现存在配置缺陷与隔离失效问题，可能引发跨容器攻击或敏感数据泄漏~\cite{nvidia-vulnerability-analysis-container-security, aimonks-nvidiascape-vulnerability, nvidia-container-toolkit-security-bulletin, wiz-nvidia-ai-vulnerability}。此外，GPU 编译器及相关开发工具链同样曾被披露存在多项安全漏洞，这进一步扩大了硬件加速层在 AI 供应链中的攻击面~\cite{cve-2024-53870, cve-2024-53871, cve-2024-53872}。更为严峻的是，上述驱动、容器与编译器等关键供应链组件多处于闭源或半开源状态，用户与研究者难以对其内部实现进行独立审计，使漏洞发现与修复高度依赖厂商响应，一旦攻击者率先掌握可被稳定利用的漏洞，便可能借助硬件加速层对上层 AI 框架与应用产生连锁影响。
 
-从供应链视角来看，上述研究虽主要聚焦于单一系统或攻击技术本身，但其揭示的 GPU 架构缺陷与实现漏洞，实际上构成了 AI 系统硬件加速层的重要供应链风险。一旦底层 GPU 运行时或驱动存在可被稳定利用的安全弱点，上层依赖该硬件执行的模型推理、训练任务乃至云端 AI 服务，均可能受到连锁影响。尤其是在模型即服务（Model-as-a-Service）与多租户 GPU 共享场景下，硬件层面的安全问题可能通过框架与运行时逐级放大，成为 AI 供应链中难以察觉却影响深远的薄弱环节。
+从技术研究角度看，现有国内外学术工作主要从 GPU 架构分析与漏洞利用两个方面对硬件加速层展开系统性研究。在 GPU 架构分析方面，研究者通过微架构测试与逆向工程方法，对不透明或半透明的 GPU 内部实现进行了深入探索。Jia 等人率先对 NVIDIA Volta 架构 GPU 的缓存层次结构与访存机制进行了系统分析~\cite{jia2018dissecting}，随后又扩展至 Turing 架构~\cite{jia2019dissecting}。此后，多项工作采用类似方法对 NVIDIA 不同代 GPU 架构进行逆向分析，旨在理解其内部设计与安全边界~\cite{abdelkhalik2022demystifying, jarmusch2025dissecting, luo2025dissecting}。
 
+在漏洞利用方面，针对 GPU 的攻击研究主要集中于侧信道 (Side-channel Attacks) 与隐蔽信道攻击 (Covert Channel Attack)。Naghibijouybari 等人首次证明，基于 OpenGL 或 CUDA 的间谍程序可以通过 GPU 侧信道提取网页指纹、用户交互行为，甚至恢复其他 CUDA 应用中神经网络模型的内部参数~\cite{naghibijouybari2018rendered}。Zhang 等人进一步逆向了 Ampere 架构 GPU 的页表实现细节和多级缓存 (Cache) 的实现细节，并指出在多实例 GPU 特性 (Multi-Instance GPU, MIG) 场景下，由于 L3 Cache 共享机制仍然存在跨实例侧信道风险~\cite{zhang2023t}。Nayak 等人利用统一虚拟内存 (Unified Virtual Memory, UVM) 和快表 (Translation Lookaside Buffer, TLB) 机制，在 GPU 上构建隐蔽信道，实现了对 GPU 加速数据库应用数据的泄漏~\cite{nayak2021mis}。此外，Dutta 等人利用 GPU 与 CPU 之间共享缓存与总线的特性，在 Intel 平台上构建了高带宽隐蔽信道，进一步拓展了跨硬件组件攻击的可能性~\cite{dutta2021leakybuddies}。
+
+在内存漏洞分析方面，已有研究揭示了 GPU 内存管理机制中存在的多种安全隐患。Guo 等人对 NVIDIA GPU 上的越界访问 (Out Of Bound, OOB) 漏洞进行了系统性分析，证实了 GPU 上 OOB BUG 利用的可能性，他们还对 GPU 栈内存布局进行了逆向工程~\cite{yanan:profit_for_fun}。Mittal 等人对 GPU 漏洞进行了全面综述，从数据泄露、侧信道与隐蔽信道等角度对攻击模式进行了系统分类~\cite{mittal2018survey}。Miele 等人利用 GPU 上的栈溢出漏洞劫持函数指针，并分析了在 GPU 环境中实施返回导向编程攻击 (Return-Oriented Programming, ROP) 的可行性~\cite{miele2016buffer}。此外，Park 等人提出的 \code{Mind Control} 攻击通过操纵 GPU 设备内存并利用固定 CUDA 库地址干扰深度学习系统推理过程~\cite{park2020mind}；Sorensen 等人提出的 \code{LeftoverLocals} 攻击，利用未初始化的 GPU 局部内存实现跨进程或跨容器的数据恢复，他们的研究恢复了 Apple、Qualcomm 和 AMD 等厂商的 GPU 上的局部内存数据，对其他用户的交互式大语言模型会话进行窃听~\cite{tyler2024leftoverlocals}。Roels 等人进一步研究了 GPU 内存中的 ROP 小组件，并提出了绕过 NVIDIA 将返回地址存储在寄存器中的防御机制的组合式攻击方法~\cite{returning_exploits2025}。
+
+综上所述，现有研究从硬件架构、配套驱动和工具链软件，以及漏洞利用等多个维度系统揭示了硬件加速层的供应链在安全性方面的潜在风险。然而这些工作大多聚焦于单点漏洞、特定攻击技术或底层实现缺陷，并且仅仅将安全边界界定于 GPU 或者 NPU 等硬件加速设备，将其设为孤立的攻击目标，并未深入分析跨设备的安全性，例如是否可以从 GPU 侧威胁到 CPU 侧的安全性，再由此通过框架与运行时接口向上层 AI 系统传导安全影响。
 
 \section{本文研究内容与贡献}
+针对 AI 供应链的三个不同层级，本文对每个层级都进行了细致地安全性分析，弥补了现有工作的不足的同时，也发现了新的可攻击面，并对每个可攻击面都提供了相应的检测方案来保护 AI 系统。
 \section{本文组织与章节安排}
 
 
