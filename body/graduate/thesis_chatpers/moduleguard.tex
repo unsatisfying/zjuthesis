@@ -105,8 +105,89 @@ pip 在安装 ysr-monitor (v0.1.5) 软件时会自动解析并安装其依赖树
 本研究旨在对包含超过 420 万个软件包版本的整个 PyPI 生态系统进行全量分析，这对依赖解析算法的效率与准确性提出了双重挑战。在准确性方面，现有工作虽尝试利用本地知识库加速和 SMT 约束求解，但其依赖元数据获取方式往往过于片面，通常仅解析单一类型的配置文件（如仅分析源码包中的 \code{setup.py} 或二进制包中的 \code{requires.txt}），导致元数据缺失。此外，Python 依赖关系具有强环境敏感性，现有静态方法常忽略环境标记（Environment Markers）和额外依赖（Extra Dependencies），从而导致解析结果不完整。在效率方面，尽管直接调用 \code{pip} 进行实际安装可获取准确的依赖图，但由于 Python 包管理器采用回溯算法进行依赖版本仲裁，该过程会触发海量软件包的重复下载与安装试错。在生态系统级别的分析任务中，这种基于动态安装的解析方式将产生极其高昂的时间成本与计算开销，不具备可扩展性。
 
 \subsection{具体设计}
-为了解决以上两个难题，本研究提出 ModuleGuard 框架，
-\subsubsection{InstSimulator技术设计}
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figure/ModuleGuard框架图.png}
+    \caption{\label{fig:module_framework}ModuleGuard框架图}
+\end{figure}
+为应对前述技术挑战，本章提出并设计了 ModuleGuard 自动化分析与防护框架。如图~\ref{fig:module_framework} 所示，该框架的整体工作流主要由三个核心阶段构成：
+
+第一阶段为元数据采集与解析引擎构建。该阶段旨在全面提取 Python 生态系统中所有可用软件包及其历史版本的元数据。针对异构分发格式导致的模块信息提取难题，本研究创新性地提出了一种基于无安装语义模拟的提取技术 InstSimulator。该技术通过对多源异构元数据进行自动化提取与归一化解析，结合虚拟文件树的状态模拟，实现了对海量软件包安装后真实模块路径的高效、精准推演。同时，为打破大规模依赖解析中效率与准确性的权衡难题，本研究设计了环境感知型依赖解析策略 EnvResolver。该策略通过引入本地环境约束条件显著提升了传递性依赖的解析精度，并结合依赖解析顺序的启发式优化算法大幅降低了回溯开销，从而支撑全生态规模的高效依赖图谱构建。
+
+第二阶段为模块冲突模式的实证溯源与威胁建模。该阶段旨在对模块冲突现象进行细粒度的特征刻画，深入剖析其根本成因与衍生影响。本研究系统性地采集了 GitHub 与 StackOverflow 等开源社区中与模块冲突相关的真实 Issue 与讨论记录~\cite{github-website,stackoverflow-website}。通过多维度的定性分析与归纳，最终提炼出三种典型的模块冲突模式，并严格界定了其在现实世界中可能引发的两类核心安全威胁。
+
+第三阶段为全生态规模的模块冲突检测与安全治理。基于前两阶段构建的解析引擎与威胁模型，本阶段旨在对整个 PyPI 生态仓库及 GitHub 上的热门 AI 项目进行全量的模块冲突自动化扫描。本研究不仅量化评估了模块冲突风险在供应链层面的演进规律，还通过主动向开源社区披露潜在风险并协助开发者修复依赖配置，在 AI 软件应用层构建了一套抵御模块冲突威胁的闭环防御机制。
+
+\subsubsection{InstSimulator 设计}
+为了解决异构分发格式的模块信息提取难题，本研究设计并提出了 InstSimulator 技术，该技术核心逻辑是将异构的分发软件包进行静态元数据解析，形成统一的解析参数，并结合文件树的抽象模拟，从而在不实际执行安装逻辑的前提条件下，高效且准确地从异构软件包中提取出模块路径信息。
+
+\textbf{多源元数据提取。} 在处理异构软件包方面，本研究首先对 PyPI 生态中所有与模块相关的配置文件以及他们的格式，参数进行了系统性地研究。如表~\ref{tab:statistic metadata}所示，
+
+
+\begin{table}[htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.5}
+\caption{模块路径和依赖声明相关文件和参数列表}
+\label{tab:statistic metadata}
+
+\begin{threeparttable}
+\begin{tabular}{
+    >{\centering\arraybackslash}m{2.4cm}
+    >{\raggedright\arraybackslash}m{2.6cm}
+    >{\raggedright\arraybackslash}m{5.2cm}
+    >{\raggedright\arraybackslash}m{4.8cm}
+}
+\toprule
+
+% ================= 表头 =================
+\cellcolor[HTML]{C0C0C0}\textbf{分类} &
+\cellcolor[HTML]{C0C0C0}\textbf{文件 (File)} &
+\cellcolor[HTML]{C0C0C0}\textbf{模块相关数据} &
+\cellcolor[HTML]{C0C0C0}\textbf{依赖相关数据} \\
+\midrule
+
+% ================= 元数据文件 =================
+\multirow{3}{*}{\textbf{元数据文件}}
+& \cellcolor[HTML]{FFFFFF}EGG-INFO\tnote{*}
+& \cellcolor[HTML]{FFFFFF}top\_level.txt, SOURCES.txt
+& \cellcolor[HTML]{FFFFFF}requires.txt \\
+
+& \cellcolor[HTML]{EFEFEF}egg-info\tnote{*}
+& \cellcolor[HTML]{EFEFEF}top\_level.txt, SOURCES.txt, namespace\_packages.txt
+& \cellcolor[HTML]{EFEFEF}requires.txt \\
+
+& \cellcolor[HTML]{FFFFFF}dist-info\tnote{*}
+& \cellcolor[HTML]{FFFFFF}top\_level.txt, RECORD, namespace\_packages.txt
+& \cellcolor[HTML]{FFFFFF}METADATA \\
+\midrule
+
+% ================= 配置文件 =================
+\multirow{3}{*}{\textbf{配置文件}}
+& \cellcolor[HTML]{EFEFEF}setup.py
+& \cellcolor[HTML]{EFEFEF}py\_modules, packages, package\_dir, namespace\_packages
+& \cellcolor[HTML]{EFEFEF}install\_requires, extras\_require \\
+
+& \cellcolor[HTML]{FFFFFF}setup.cfg
+& \cellcolor[HTML]{FFFFFF}py\_modules, packages, package\_dir, namespace\_packages
+& \cellcolor[HTML]{FFFFFF}install\_requires, extras\_require \\
+
+& \cellcolor[HTML]{EFEFEF}pyproject.toml
+& \cellcolor[HTML]{EFEFEF}py-modules, packages, package-dir
+& \cellcolor[HTML]{EFEFEF}dependencies, optional-dependencies \\
+
+\bottomrule
+\end{tabular}
+
+\begin{tablenotes}
+\footnotesize
+\item[*] 大写的 EGG-INFO 是 ``egg'' 类型包的元数据；小写 egg-info 是 ``tar.gz'' 源码包元数据；dist-info 则是 ``whl'' 包元数据。
+\end{tablenotes}
+
+\end{threeparttable}
+\end{table}
+
+
 
 \section{ModuleGuard具体实现}
 
