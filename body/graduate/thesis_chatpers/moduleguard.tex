@@ -422,17 +422,17 @@ m_1 \xleftrightarrow{\text{conflict}} m_2 &: m_1 \text{ 与 } m_2 \text{ 具有�
 \label{tab:Top 10 module paths}
 \begin{tabular}{lcc}
 \hline
-\multicolumn{1}{c}{模块路径}      & 最新版本包数量  & 所有版本包数量\\ \hline
+\multicolumn{1}{c}{\cellcolor[HTML]{C0C0C0}\textbf{模块路径}}      & \cellcolor[HTML]{C0C0C0}\textbf{最新版本包}数量  & \cellcolor[HTML]{C0C0C0}\textbf{所有版本包数量}\\ \hline
 src/\_\_init\_\_.py                   & 1,157               & 8,777\\
-\_\_init\_\_.py                       & 1,083               & 4,421\\
+\cellcolor[HTML]{EFEFEF}\_\_init\_\_.py                       & \cellcolor[HTML]{EFEFEF}1,083               & \cellcolor[HTML]{EFEFEF}4,421\\
 utils/\_\_init\_\_.py                 & 410                & 3,899\\
-distributions/\_\_init\_\_.py         & 404                & 448\\
+\cellcolor[HTML]{EFEFEF}distributions/\_\_init\_\_.py         & \cellcolor[HTML]{EFEFEF}404                & \cellcolor[HTML]{EFEFEF}448\\
 distributions/Generaldistribution.py  & 394                & 431\\
-distributions/Gaussiandistribution.py & 394                & 431\\
+\cellcolor[HTML]{EFEFEF}distributions/Gaussiandistribution.py & \cellcolor[HTML]{EFEFEF}394                & \cellcolor[HTML]{EFEFEF}431\\
 distributions/Binomialdistribution.py & 393                & 428\\
-client/\_\_init\_\_.py                & 367                & 1,142\\
+\cellcolor[HTML]{EFEFEF}client/\_\_init\_\_.py                & \cellcolor[HTML]{EFEFEF}367                & \cellcolor[HTML]{EFEFEF}1,142\\
 scripts/\_\_init\_\_.py               & 363                & 5,336\\ 
-server/\_\_init\_\_.py               & 360                & 796\\ \hline
+\cellcolor[HTML]{EFEFEF}server/\_\_init\_\_.py               & \cellcolor[HTML]{EFEFEF}360                & \cellcolor[HTML]{EFEFEF}796\\ \hline
 \end{tabular}
 
 \end{table}
@@ -463,6 +463,52 @@ server/\_\_init\_\_.py               & 360                & 796\\ \hline
     \label{fig: Libtimestamp}
 \end{figure}
 
+\begin{table}[t]
+\centering
+\small % 如果版面紧张，可以改为 \footnotesize
+\renewcommand{\arraystretch}{1.3} % 稍微拉开行距，提升阅读体验
+\caption{向 GitHub 开源社区报告的模块冲突漏洞工单及修复状态}
+\label{tab:reported_issues}
+\begin{tabular}{@{} l l c c @{}}
+\toprule
+\cellcolor[HTML]{C0C0C0}\textbf{开源项目} & \cellcolor[HTML]{C0C0C0}\textbf{工单号} & \cellcolor[HTML]{C0C0C0}\textbf{已回复} & \cellcolor[HTML]{C0C0C0}\textbf{已修复} \\ \midrule
+wzpan/wukong-robot & \#286 & $\checkmark$ & - \\
+\cellcolor[HTML]{EFEFEF}RVC-Project/Retrieval-based-Voice-Conversion-WebUI & \cellcolor[HTML]{EFEFEF}\#908 & \cellcolor[HTML]{EFEFEF}- & \cellcolor[HTML]{EFEFEF}$\checkmark$ \\
+google/BIG-bench & \#946 & - & - \\
+\cellcolor[HTML]{EFEFEF}google-research/text-to-text-transfer-transformer & \cellcolor[HTML]{EFEFEF}\#1106 & \cellcolor[HTML]{EFEFEF}- & \cellcolor[HTML]{EFEFEF}- \\
+asyml/texar & \#303 & - & - \\
+\cellcolor[HTML]{EFEFEF}invoke-ai/InvokeAI & \cellcolor[HTML]{EFEFEF}\#4078 & \cellcolor[HTML]{EFEFEF}$\checkmark$ & \cellcolor[HTML]{EFEFEF}$\checkmark$ \\
+Picsart-AI-Research/Text2Video-Zero & \#63 & - & - \\
+\cellcolor[HTML]{EFEFEF}sail-sg/EditAnything & \cellcolor[HTML]{EFEFEF}\#51 & \cellcolor[HTML]{EFEFEF}$\checkmark$ & \cellcolor[HTML]{EFEFEF}$\checkmark$ \\
+AIGC-Audio/AudioGPT & \#89 & - & - \\
+\cellcolor[HTML]{EFEFEF}Sygil-Dev/sygil-webui & \cellcolor[HTML]{EFEFEF}\#1808 & \cellcolor[HTML]{EFEFEF}- & \cellcolor[HTML]{EFEFEF}- \\
+riffusion/riffusion & \#151 & $\checkmark$ & $\checkmark$ \\
+\cellcolor[HTML]{EFEFEF}Anjok07/ultimatevocalremovergui & \cellcolor[HTML]{EFEFEF}\#702 & \cellcolor[HTML]{EFEFEF}$\checkmark$ & \cellcolor[HTML]{EFEFEF}$\checkmark$ \\
+pjialin/py12306 & \#454 & - & - \\
+\cellcolor[HTML]{EFEFEF}PaddlePaddle/PaddleSpeech & \cellcolor[HTML]{EFEFEF}\#3432 & \cellcolor[HTML]{EFEFEF}$\checkmark$ & \cellcolor[HTML]{EFEFEF}$\checkmark$ \\
+marqo-ai/marqo & \#556 & $\checkmark$ & $\checkmark$ \\
+\cellcolor[HTML]{EFEFEF}nbei/Deep-Flow-Guided-Video-Inpainting & \cellcolor[HTML]{EFEFEF}\#113 & \cellcolor[HTML]{EFEFEF}- & \cellcolor[HTML]{EFEFEF}- \\
+saleor/saleor & \#13554 & - & $\checkmark$ \\
+\cellcolor[HTML]{EFEFEF}jantic/DeOldify & \cellcolor[HTML]{EFEFEF}\#482 & \cellcolor[HTML]{EFEFEF}$\checkmark$ & \cellcolor[HTML]{EFEFEF}$\checkmark$ \\
+PaddlePaddle/PaddleRec & \#940 & - & - \\
+\cellcolor[HTML]{EFEFEF}kohya-ss/sd-scripts & \cellcolor[HTML]{EFEFEF}\#684 & \cellcolor[HTML]{EFEFEF}$\checkmark$ & \cellcolor[HTML]{EFEFEF}$\checkmark$ \\
+bmaltais/kohya\_ss & \#1267 & $\checkmark$ & $\checkmark$ \\
+\cellcolor[HTML]{EFEFEF}sensity-ai/dot & \cellcolor[HTML]{EFEFEF}\#98 & \cellcolor[HTML]{EFEFEF}$\checkmark$ & \cellcolor[HTML]{EFEFEF}$\checkmark$ \\
+chatchat-space/Langchain-Chatchat & \#952 & $\checkmark$ & $\checkmark$ \\
+\cellcolor[HTML]{EFEFEF}PaddlePaddle/PaddleOCR & \cellcolor[HTML]{EFEFEF}\#10490 & \cellcolor[HTML]{EFEFEF}- & \cellcolor[HTML]{EFEFEF}- \\
+microsoft/TaskMatrix & \#434 & - & - \\
+\cellcolor[HTML]{EFEFEF}weecology/DeepForest & \cellcolor[HTML]{EFEFEF}\#464 & \cellcolor[HTML]{EFEFEF}$\checkmark$ & \cellcolor[HTML]{EFEFEF}$\checkmark$ \\
+OpenGVLab/InternGPT & \#53 & - & - \\
+\cellcolor[HTML]{EFEFEF}Rudrabha/Wav2Lip & \cellcolor[HTML]{EFEFEF}\#536 & \cellcolor[HTML]{EFEFEF}- & \cellcolor[HTML]{EFEFEF}- \\
+lucasjinreal/weibo\_terminater & \#62 & - & - \\
+\cellcolor[HTML]{EFEFEF}airbnb/streamalert & \cellcolor[HTML]{EFEFEF}\#1345 & \cellcolor[HTML]{EFEFEF}- & \cellcolor[HTML]{EFEFEF}- \\
+jupyter/jupyter\_core & \#350 & $\checkmark$ & $\checkmark$ \\
+\cellcolor[HTML]{EFEFEF}microsoft/TaskMatrix & \cellcolor[HTML]{EFEFEF}\#345 & \cellcolor[HTML]{EFEFEF}- & \cellcolor[HTML]{EFEFEF}- \\
+qpzzk/zz\_spider & \#1 & - & - \\
+\cellcolor[HTML]{EFEFEF}NickHugi/PyKotor & \cellcolor[HTML]{EFEFEF}\#3 & \cellcolor[HTML]{EFEFEF}$\checkmark$ & \cellcolor[HTML]{EFEFEF}$\checkmark$ \\ \bottomrule
+\end{tabular}
+\end{table}
+
 \textbf{依赖图内部冲突分析。}
 对 420 万个软件包的依赖图拓扑分析显示，共有 129,840 个软件包（占比 3.07\%）存在依赖图内部冲突，涉及 11,666 个项目。其中，38,371 个软件包（关联 4,516 个项目）在依赖树中存在路径完全相同但文件内容哈希值不同的冲突模块。这种情况在 \code{pip} 安装软件包时会自定触发覆盖行为引发功能异常。
 部分冲突模块会随着上游依赖版本迭代而发生内容变更，从而在下游系统中形成潜在功能退化风险。即便某些冲突模块在当前主执行路径中未被直接调用，其静态覆盖行为已破坏软件包的物理完整性。在复杂 AI 系统中，无法保证这些模块不会在未来版本或异常处理分支中被触发。
@@ -471,62 +517,24 @@ server/\_\_init\_\_.py               & 360                & 796\\ \hline
 
 此外，冲突在项目生命周期中表现出显著的潜伏性。在 4,516 个明确存在内容冲突的项目中，冲突集中分布于早期连续版本区间（2,342 个项目）或贯穿全部历史版本（1,819 个项目）。统计结果显示，此类未决冲突平均跨越 6.5 个版本发布周期。该现象表明，维护者往往仅在出现显性功能故障后才进行修复，而大量冲突在未触发异常的情况下长期潜伏，削弱系统整体可靠性。例如，\code{aniposelib} 项目在 0.3.7 版本之前长期处于 \code{opencv-python} 与 \code{opencv-contrib-python} 的依赖冲突状态中，直至终端用户在 Issue 中报告了由依赖图内部冲突引发的严重运行时错误后，维护者才在后续版本中予以纠正~\cite{aniposelib}。如图~\ref{fig: Libtimestamp}从时间维度观察，依赖图内部冲突的受影响项目数量亦呈增长趋势。部分早期发布时依赖结构健康的软件包，在上游依赖迁移、分裂或废弃后，重新解析时触发新的依赖图中模块冲突问题，这一现象凸显了软件供应链依赖关系的长期脆弱性与动态退化特征。
 
-\begin{table}[t]
-\centering
-\small % 如果版面紧张，可以改为 \footnotesize
-\renewcommand{\arraystretch}{1.4} % 稍微拉开行距，提升阅读体验
-\caption{向 GitHub 开源社区报告的模块冲突漏洞工单及修复状态}
-\label{tab:reported_issues}
-\begin{tabular}{@{} l l c c @{}}
-\toprule
-\textbf{开源项目} & \textbf{工单号} & \textbf{已回复} & \textbf{已修复} \\ \midrule
-wzpan/wukong-robot & \href{https://github.com/wzpan/wukong-robot/issues/286}{\#286} & $\checkmark$ & - \\
-RVC-Project/Retrieval-based-Voice-Conversion-WebUI & \href{https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/issues/908}{\#908} & - & $\checkmark$ \\
-google/BIG-bench & \href{https://github.com/google/BIG-bench/issues/946}{\#946} & - & - \\
-google-research/text-to-text-transfer-transformer & \href{https://github.com/google-research/text-to-text-transfer-transformer/issues/1106}{\#1106} & - & - \\
-asyml/texar & \href{https://github.com/asyml/texar/issues/303}{\#303} & - & - \\
-invoke-ai/InvokeAI & \href{https://github.com/invoke-ai/InvokeAI/issues/4078}{\#4078} & $\checkmark$ & $\checkmark$ \\
-Picsart-AI-Research/Text2Video-Zero & \href{https://github.com/Picsart-AI-Research/Text2Video-Zero/issues/63}{\#63} & - & - \\
-sail-sg/EditAnything & \href{https://github.com/sail-sg/EditAnything/issues/51}{\#51} & $\checkmark$ & $\checkmark$ \\
-AIGC-Audio/AudioGPT & \href{https://github.com/AIGC-Audio/AudioGPT/issues/89}{\#89} & - & - \\
-Sygil-Dev/sygil-webui & \href{https://github.com/Sygil-Dev/sygil-webui/issues/1808}{\#1808} & - & - \\
-riffusion/riffusion & \href{https://github.com/riffusion/riffusion/issues/151}{\#151} & $\checkmark$ & $\checkmark$ \\
-Anjok07/ultimatevocalremovergui & \href{https://github.com/Anjok07/ultimatevocalremovergui/issues/702}{\#702} & $\checkmark$ & $\checkmark$ \\
-pjialin/py12306 & \href{https://github.com/pjialin/py12306/issues/454}{\#454} & - & - \\
-PaddlePaddle/PaddleSpeech & \href{https://github.com/PaddlePaddle/PaddleSpeech/issues/3432}{\#3432} & $\checkmark$ & $\checkmark$ \\
-marqo-ai/marqo & \href{https://github.com/marqo-ai/marqo/issues/556}{\#556} & $\checkmark$ & $\checkmark$ \\
-nbei/Deep-Flow-Guided-Video-Inpainting & \href{https://github.com/nbei/Deep-Flow-Guided-Video-Inpainting/issues/113}{\#113} & - & - \\
-saleor/saleor & \href{https://github.com/saleor/saleor/issues/13554}{\#13554} & - & $\checkmark$ \\
-jantic/DeOldify & \href{https://github.com/jantic/DeOldify/issues/482}{\#482} & $\checkmark$ & $\checkmark$ \\
-PaddlePaddle/PaddleRec & \href{https://github.com/PaddlePaddle/PaddleRec/issues/940}{\#940} & - & - \\
-kohya-ss/sd-scripts & \href{https://github.com/kohya-ss/sd-scripts/issues/684}{\#684} & $\checkmark$ & $\checkmark$ \\
-bmaltais/kohya\_ss & \href{https://github.com/bmaltais/kohya_ss/issues/1267}{\#1267} & $\checkmark$ & $\checkmark$ \\
-sensity-ai/dot & \href{https://github.com/sensity-ai/dot/issues/98}{\#98} & $\checkmark$ & $\checkmark$ \\
-chatchat-space/Langchain-Chatchat & \href{https://github.com/chatchat-space/Langchain-Chatchat/issues/952}{\#952} & $\checkmark$ & $\checkmark$ \\
-PaddlePaddle/PaddleOCR & \href{https://github.com/PaddlePaddle/PaddleOCR/issues/10490}{\#10490} & - & - \\
-microsoft/TaskMatrix & \href{https://github.com/microsoft/TaskMatrix/issues/434}{\#434} & - & - \\
-weecology/DeepForest & \href{https://github.com/weecology/DeepForest/issues/464}{\#464} & $\checkmark$ & $\checkmark$ \\
-OpenGVLab/InternGPT & \href{https://github.com/OpenGVLab/InternGPT/issues/53}{\#53} & - & - \\
-Rudrabha/Wav2Lip & \href{https://github.com/Rudrabha/Wav2Lip/issues/536}{\#536} & - & - \\
-lucasjinreal/weibo\_terminater & \href{https://github.com/lucasjinreal/weibo_terminater/issues/62}{\#62} & - & - \\
-airbnb/streamalert & \href{https://github.com/airbnb/streamalert/issues/1345}{\#1345} & - & - \\
-jupyter/jupyter\_core & \href{https://github.com/jupyter/jupyter_core/issues/350}{\#350} & $\checkmark$ & $\checkmark$ \\
-microsoft/TaskMatrix & \href{https://github.com/microsoft/TaskMatrix/issues/345}{\#345} & - & - \\
-qpzzk/zz\_spider & \href{https://github.com/qpzzk/zz_spider/issues/1}{\#1} & - & - \\
-NickHugi/PyKotor & \href{https://github.com/NickHugi/PyKotor/issues/3}{\#3} & $\checkmark$ & $\checkmark$ \\ \bottomrule
-\end{tabular}
-\end{table}
+
 \subsubsection{GitHub 热门项目检测结果}
 本研究选取 GitHub 平台中具有较高影响力的开源 Python 项目开展系统性实证分析，检测其中潜伏的依赖图内部冲突。
 实验结果显示，共有 519 个项目（占比 13.93\%）的 10,850 个版本标签（占比 11.61\%）存在模块覆盖风险。相较于 PyPI 生态的宏观统计结果，依赖图内部冲突在 GitHub 实际工程项目中的发生比例更高。其原因在于，面向真实应用场景的项目通常构建了更为复杂且规模更大的依赖拓扑结构，因而更易产生传递性的模块命名空间重叠。即便覆盖前后模块文件的内容哈希值一致，在语义层面未直接引发显性运行时异常，这类静默覆盖行为仍会破坏本地环境中软件包的物理完整性，并显著增加环境异常的定位与调试难度，因为并没法保证后续该文件是否会在某一个版本进行修改，从而诱发潜在威胁。
 
-进一步分析表明，在 108 个项目的 2,569 个版本标签中，覆盖前后模块文件存在实质性内容差异，从而带来直接的功能性错误风险。在这 108 个受影响项目中，有 65 个项目的最新版本仍遗留该隐患，其余 43 个项目则在后续版本迭代中完成了修复。统计结果显示，每个未修复冲突平均跨越 23 个历史版本，反映出该类问题具有显著的潜伏期与隐蔽性。通常仅当终端用户在特定执行路径下触发显性崩溃并提交错误报告后，维护者才会意识到冲突的存在并采取修复措施。针对上述 65 个包含未决冲突的最新版本项目，本研究开展了细粒度人工代码审计，并向相关维护者提交了 35 个安全漏洞工单（因为部分项目的冲突原因相同，因此本研究向依赖的维护者提交工单而非项目本身维护者）。截至目前，已有 15 个项目团队作出正式回应，其中 16 个项目已得到肯定回复并进行了修复以消除模块冲突（部分项目静默修复了问题，并未回复工单）。对于尚未回应的项目，鉴于其冲突触发机制与已确认问题在结构上完全同构，本研究合理推断，这些遗留冲突同样可能对受限系统环境造成实质性的功能破坏。
+进一步分析表明，在 108 个项目的 2,569 个版本标签中，覆盖前后模块文件存在实质性内容差异，从而带来直接的功能性错误风险。在这 108 个受影响项目中，有 65 个项目的最新版本仍遗留该隐患，其余 43 个项目则在后续版本迭代中完成了修复。统计结果显示，每个未修复冲突平均跨越 23 个历史版本，反映出该类问题具有显著的潜伏期与隐蔽性。通常仅当终端用户在特定执行路径下触发显性崩溃并提交错误报告后，维护者才会意识到冲突的存在并采取修复措施。针对上述 65 个包含未决冲突的最新版本项目，本研究开展了细粒度人工代码审计，并向相关维护者提交了 35 个安全漏洞工单（因为部分项目的冲突原因相同，因此本研究向依赖的维护者提交工单而非项目本身维护者）。如表~\ref{tab:reported_issues}所示，截至目前，已有 15 个项目团队作出正式回应，其中 16 个项目已得到了修复以消除模块冲突（部分项目静默修复了问题，并未回复工单），还有部分项目正在持续跟进中。对于尚未回应的项目，鉴于其冲突触发机制与已确认问题在结构上完全同构，本研究合理推断，这些遗留冲突同样可能对受限系统环境造成实质性的功能破坏。
 
 实证分析显示，模块冲突问题在 AI 相关项目中呈现出显著高发态势。其典型诱因源于底层计算机视觉库的交叉依赖。开发者在构建 AI 系统时，通常显式声明依赖四种 \code{opencv-python} 变体发行版中的某一版本，同时还会引入其他 AI 相关第三方组件。然而，这些组件在其传递性依赖树中往往再次声明其他互斥版本的 \code{opencv} 基础库，例如\code{opencv-python-headless}。尽管官方文档已明确指出这些变体共享同一 \code{cv2} 模块命名空间，无法在同一运行环境中共存，但此类冲突在实际工程中仍广泛存在~\cite{opencv}。其根本原因在于，应用层开发者通常只能显式约束直接依赖，而对传递性依赖缺乏可见性与控制能力。由此产生的底层命名空间重叠，直接导致多个 AI 衍生项目在同一生产环境集成部署时出现严重的不兼容与环境破坏问题。
 
 研究进一步发现，部分开发者在顶层依赖中同时引入功能重叠且存在模块级冲突的软件包。通过与开源社区维护者的沟通，本研究观察到一种风险较高的开发模式，即当开发者遭遇由底层模块覆盖引发的异常行为时，往往通过增加新的依赖项以期“覆盖”原有环境或缓解错误，而非从依赖拓扑结构层面定位冲突根因。这种做法表明，部分开发实践过度关注程序是否能够暂时运行，而忽视了依赖图结构的健康性与文件系统层面的完整性约束。引入功能冗余依赖不仅显著提升工程复杂度，也增加了下游用户在构建与部署环境时的失败概率。大量项目 Issue 讨论记录进一步表明，开发者普遍缺乏对“模块冲突”这一系统级架构缺陷的整体认知。多数修复行为依赖反复试错机制，通过增删依赖配置维持程序的脆弱可运行状态。实证数据亦支持该观察：在本研究追踪的 16 个已确认修复的最新版本项目中，有 12 个项目的最终修复方案仅为移除冗余依赖声明。综上所述，本研究的量化分析揭示了模块冲突在软件供应链内部的传播机制与潜在破坏路径，并为开发者在开发与调试阶段规范依赖声明、识别环境风险及提升供应链稳健性提供了实证基础。
 
 \section{本章小节}
+针对 AI 系统软件应用层日益严峻的模块冲突威胁，本章提出并设计了一套名为 \code{ModuleGuard} 的自动化分析与检测框架。具体而言，该框架的整体工作流主要包含三个核心阶段：
 
+在第一阶段为元数据采集阶段，其为突破全生态规模下模块与依赖分析中存在的效率瓶颈与准确率偏低的难题，本章创新性地提出了 \code{InstSimulator} 与 \code{EnvResolver} 两项关键技术。这两项技术能够在不执行实际物理安装的前提下，高效、高保真地提取整个 PyPI 生态系统的模块拓扑路径与传递性依赖图信息，进而构建了大规模的本地依赖知识库。基于真实 \code{pip} 安装结果构建的基准测试集评估表明，上述两项技术在节点级与图级等多个验证维度下均实现了 95\% 以上的解析准确率。
+
+在第二阶段为模块冲突模式的实证溯源阶段，本研究通过对 GitHub 和 StackOverflow 开源社区中的真实 Issue 进行系统性的实证挖掘与溯源分析，科学归纳了三类典型的模块冲突模式，并严格界定了其引发的两类核心安全威胁。基于底层包管理器缺乏物理隔离以及导入机制缺乏上下文校验的结构性缺陷，本章首次提出并定义了一种针对 AI 系统软件应用层的新型软件供应链攻击向量——模块替换攻击。
+
+在第三阶段为模块冲突检测阶段，为了有效防御模块替换攻击并缓解模块冲突带来的潜在系统风险，本研究依托前期构建的本地知识库，利用 \code{ModuleGuard} 框架对整个 PyPI 仓库及 GitHub 上的热门 AI 开源项目进行了全量自动化扫描检测。在挖掘出大量真实世界中隐蔽的模块冲突缺陷后，本研究积极向相关项目维护者披露漏洞工单，并协助其完成依赖配置的修复，从而在 AI 系统软件应用层成功建立了一套闭环的供应链安全防御与生态治理机制。
 
 
