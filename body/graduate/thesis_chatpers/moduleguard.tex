@@ -14,7 +14,7 @@
 
 其次，在威胁建模层面，本研究深入挖掘了 Python 包管理工具（如 \code{pip}）在依赖解析与安装过程中的安全缺陷，首次定义了一种针对 AI 系统的新型软件供应链攻击向量——“模块替换攻击”。该攻击利用 Python 扁平化的安装目录结构与“首次匹配”的模块导入机制，使攻击者能够通过构造同名模块路径，在依赖安装阶段静默覆盖目标系统的核心组件，或在运行时劫持正常的模块加载流程。本研究详细论证了该攻击破坏 AI 软件完整性、导致环境不可逆损坏以及在大规模依赖树中潜伏的机理。
 
-在技术实现层面，为了解决大规模软件包模块提取中存在的动态性强、开销大等难题，本研究提出了一套新型模块冲突分析技术与防护框架。其中包括一种名为 \code{InstSimulator} 的无安装语义模拟技术，通过静态模拟 \code{setup.py} 等脚本的执行逻辑，实现了对模块路径的高保真提取；以及一种环境感知型依赖解析算法 \code{EnvResolution}，通过引入环境变量约束与优先级策略，有效解决了复杂依赖场景下解析精度低与速度慢的瓶颈。基于上述核心技术实现的 \code{ModuleGuard} 框架在基准测试中达到了 95\% 以上的检测精度。
+在技术实现层面，为了解决大规模软件包模块提取中存在的动态性强、开销大等难题，本研究提出了一套新型模块冲突分析技术与防护框架。其中包括一种名为 \code{InstSimulator} 的无安装语义模拟技术，通过静态模拟 \code{setup.py} 等脚本的执行逻辑，实现了对模块路径的高保真提取；以及一种环境感知型依赖解析算法 \code{EnvResolver}，通过引入环境变量约束与优先级策略，有效解决了复杂依赖场景下解析精度低与速度慢的瓶颈。基于上述核心技术实现的 \code{ModuleGuard} 框架在基准测试中达到了 95\% 以上的检测精度。
 
 最后，本本研究利用\code{ModuleGuard}模块冲突分析框架，进行了大规模的生态分析，其包括分析了截至2023年4月的整个PyPI生态中的43万个软件包（包括420万个软件包版本），研究不仅揭示了模块冲突随生态演进呈指数级增长的趋势，还发现了冲突包在命名语义上的相似性规律。此外，本研究针对 GitHub 上3，711个高星的热门 AI 项目（涉及 93,487 个标签）进行了模块冲突检测，结果显示共有 108 个顶级项目受到供应链模块冲突的影响。本研究通过向开发者报告、工单提交及邮件沟通等方式，协助开发者修复了大量潜在风险，其实用性与有效性得到了开源社区的广泛验证与认可\code{ModuleGuard}能够有效检测AI软件应用层的模块冲突，从而防御来自于模块冲突的威胁。
 % 本研究将Python中由于命名空间冲突引起的问题称为模块冲突（Module Conflict, MC）问题，并首次对其进行了大规模地研究，并提出了一套检测MC问题的检测框架，名为ModuleGuard，来实现对软件应用层的安全防护。
@@ -52,7 +52,7 @@ Python语言于1991年首次发布依赖，以简洁易读的语法特性和强�
 
 第三种方式是\code{setup.cfg}的声明式配置方式，这也是一种静态的配置文件，同样需要\code{setuptools}工具配合。与 \code{setup.py} 不同，\code{setup.cfg} 采用纯文本的键值对格式（INI风格），用户无需编写 Python 代码，而是通过在 \code{[options]} 节中的 \code{install_requires} 字段声明基础依赖，并在 \code{[options.extras_require]} 中声明额外依赖。这种声明式（declarative）的设计避免了任意 Python 代码的执行，从而提升了可读性、可维护性以及可分析性，使得工具链（如 pip、构建系统或安全扫描工具）能够更容易地静态解析依赖关系。
 
-第四种方式是基于\code{pyproject.toml}的现代依赖声明方式，该方式由 PEP 517、PEP 518 以及 PEP 621 等一系列 Python 官方提案所定义，已逐渐成为当前 Python 生态系统中推荐的标准打包与构建机制~\cite{pep517,pep518,pep621}。\code{pyproject.toml} 通过 TOML 格式统一描述项目的构建后端与依赖信息，从而将构建逻辑与 \code{setuptools} 等具体工具解耦。用户可以在 \code{[project]} 节中通过 \code{dependencies} 字段声明基础依赖，并在 \code{[project.optional-dependencies]} 中声明额外依赖（extra dependencies），而无需再编写 \code{setup.py} 或 \code{setup.cfg} 文件。与 \code{setup.py} 的命令式脚本不同，\code{pyproject.toml} 完全采用声明式配置，所有依赖信息均以静态数据形式存在，因此构建工具能够在不执行任意代码的情况下直接解析依赖关系。这种设计显著提升了构建过程的可预测性与安全性，同时也便于自动化工具、依赖分析器以及安全扫描系统对依赖图进行静态分析。得益于上述优势，现代包管理工具（如 pip、Poetry、Hatch 与 PDM）均优先支持或默认使用 \code{pyproject.toml}，使其逐渐取代传统的 \code{setup.py}/\code{setup.cfg} 方案，成为 Python 项目的事实标准配置方式。
+第四种方式是基于\code{pyproject.toml}的现代依赖声明方式，该方式由 PEP 517、PEP 518 以及 PEP 621 等一系列 Python 官方提案所定义，已逐渐成为当前 Python 生态系统中推荐的标准打包与构建机制~\cite{pep517,pep518,pep621}。\code{pyproject.toml} 通过 TOML 格式统一描述项目的构建后端与依赖信息，从而将构建逻辑与 \code{setuptools} 等具体工具解耦。用户可以在 \code{[project]} 节中通过 \code{dependencies} 字段声明基础依赖，并在 \code{[project.optional-dependencies]} 中声明额外依赖（extra dependencies），而无需再编写 \code{setup.py} 或 \code{setup.cfg} 文件。与 \code{setup.py} 的命令式脚本不同，\code{pyproject.toml} 完全采用声明式配置，所有依赖信息均以静态数据形式存在，因此构建工具能够在不执行任意代码的情况下直接解析依赖关系。这种设计显著提升了构建过程的可预测性与安全性，同时也便于自动化工具、依赖分析器以及安全扫描系统对依赖图进行静态分析。得益于上述优势，现代包管理工具（如 pip、Poetry）均优先支持或默认使用 \code{pyproject.toml}，使其逐渐取代传统的 \code{setup.py}/\code{setup.cfg} 方案，成为 Python 项目的事实标准配置方式。
 
 \subsection{研究动机与现状}
 
@@ -105,26 +105,12 @@ pip 在安装 ysr-monitor (v0.1.5) 软件时会自动解析并安装其依赖树
 本研究旨在对包含超过 420 万个软件包版本的整个 PyPI 生态系统进行全量分析，这对依赖解析算法的效率与准确性提出了双重挑战。在准确性方面，现有工作虽尝试利用本地知识库加速和 SMT 约束求解，但其依赖元数据获取方式往往过于片面，通常仅解析单一类型的配置文件（如仅分析源码包中的 \code{setup.py} 或二进制包中的 \code{requires.txt}），导致元数据缺失。此外，Python 依赖关系具有强环境敏感性，现有静态方法常忽略环境标记（Environment Markers）和额外依赖（Extra Dependencies），从而导致解析结果不完整。在效率方面，尽管直接调用 \code{pip} 进行实际安装可获取准确的依赖图，但由于 Python 包管理器采用回溯算法进行依赖版本仲裁，该过程会触发海量软件包的重复下载与安装试错。在生态系统级别的分析任务中，这种基于动态安装的解析方式将产生极其高昂的时间成本与计算开销，不具备可扩展性。
 
 \subsection{具体设计}
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\linewidth]{figure/ModuleGuard框架图.png}
-    \caption{\label{fig:module_framework}ModuleGuard框架图}
-\end{figure}
-为应对前述技术挑战，本章提出并设计了 ModuleGuard 自动化分析与防护框架。如图~\ref{fig:module_framework} 所示，该框架的整体工作流主要由三个核心阶段构成：
-
-第一阶段为元数据采集与解析引擎构建。该阶段旨在全面提取 Python 生态系统中所有可用软件包及其历史版本的元数据。针对异构分发格式导致的模块信息提取难题，本研究创新性地提出了一种基于无安装语义模拟的提取技术 InstSimulator。该技术通过对多源异构元数据进行自动化提取与归一化解析，结合虚拟文件树的状态模拟，实现了对海量软件包安装后真实模块路径的高效、精准推演。同时，为打破大规模依赖解析中效率与准确性的权衡难题，本研究设计了环境感知型依赖解析策略 EnvResolver。该策略通过引入本地环境约束条件显著提升了传递性依赖的解析精度，并结合依赖解析顺序的启发式优化算法大幅降低了回溯开销，从而支撑全生态规模的高效依赖图谱构建。
-
-第二阶段为模块冲突模式的实证溯源与威胁建模。该阶段旨在对模块冲突现象进行细粒度的特征刻画，深入剖析其根本成因与衍生影响。本研究系统性地采集了 GitHub 与 StackOverflow 等开源社区中与模块冲突相关的真实 Issue 与讨论记录~\cite{github-website,stackoverflow-website}。通过多维度的定性分析与归纳，最终提炼出三种典型的模块冲突模式，并严格界定了其在现实世界中可能引发的两类核心安全威胁。
-
-第三阶段为全生态规模的模块冲突检测与安全治理。基于前两阶段构建的解析引擎与威胁模型，本阶段旨在对整个 PyPI 生态仓库及 GitHub 上的热门 AI 项目进行全量的模块冲突自动化扫描。本研究不仅量化评估了模块冲突风险在供应链层面的演进规律，还通过主动向开源社区披露潜在风险并协助开发者修复依赖配置，在 AI 软件应用层构建了一套抵御模块冲突威胁的闭环防御机制。
+为应对上述技术挑战，本研究提出并设计了两项关键技术：静态安装模拟技术 InstSimulator，以及一种具备环境感知能力的依赖解析器 EnvResolver。二者协同工作，为 ModuleGuard 提供准确且高效的模块与依赖分析基础。
 
 \subsubsection{InstSimulator 设计}
-为了解决异构分发格式的模块信息提取难题，本研究设计并提出了 InstSimulator 技术，该技术核心逻辑是将异构的分发软件包进行静态元数据解析，形成统一的解析参数，并结合文件树的抽象模拟，从而在不实际执行安装逻辑的前提条件下，高效且准确地从异构软件包中提取出模块路径信息。
+为解决异构分发格式条件下模块路径信息难以准确提取的问题，本研究提出了一种静态安装模拟技术 InstSimulator。该技术在不实际执行软件包安装过程的前提下，对不同分发格式的软件包进行静态解析与抽象建模，生成统一的配置中间表示，并通过语义化的虚拟文件树模拟，精确恢复软件包在真实安装环境中的模块可见性，从而为后续供应链安全分析提供可靠的模块路径信息。
 
-\textbf{多源元数据提取。} 在处理异构软件包方面，本研究首先对 PyPI 生态中所有与模块相关的配置文件以及他们的格式，参数进行了系统性地研究。如表~\ref{tab:statistic metadata}所示，
-
-
-\begin{table}[htbp]
+\begin{table}[t]
 \centering
 \small
 \renewcommand{\arraystretch}{1.5}
@@ -180,17 +166,367 @@ pip 在安装 ysr-monitor (v0.1.5) 软件时会自动解析并安装其依赖树
 \end{tabular}
 
 \begin{tablenotes}
-\footnotesize
-\item[*] 大写的 EGG-INFO 是 ``egg'' 类型包的元数据；小写 egg-info 是 ``tar.gz'' 源码包元数据；dist-info 则是 ``whl'' 包元数据。
+\small
+\item[*] 大写的 EGG-INFO 是 egg 类型包的元数据；而 egg-info 是 tar.gz 类型包的元数据；dist-info 是 whl 类型包的元数据。
 \end{tablenotes}
 
 \end{threeparttable}
 \end{table}
 
+\textbf{多源元数据提取。} 
+在多源元数据建模方面，为实现对 PyPI 生态中海量异构软件包的全面兼容，本研究首先对 PyPI 生态中与模块及依赖声明相关的元数据参数和文件进行了系统性梳理。本研究首先对 Python 体系的打包、构建与分发机制进行了自底向上的系统性分析。结合对 pip 包管理器底层源码的深度剖析与官方文档规范~\cite{pydocumentation,pip-documentation}，本研究采用差分测试方法，通过系统性地变异各类配置文件参数，精准定位了不同元数据字段对模块空间与依赖关系的实际影响链路。基于表~\ref{tab:statistic metadata} 所示的分析结果，InstSimulator 将软件包的元数据载体归纳为两类：一类为构建过程中自动生成的元数据文件，另一类为开发者显式编写的配置文件。前者通常存在于已编译的分发包中，例如 \code{.whl} 与 \code{.egg} 格式，其元数据集中存放于 \code{dist-info} 或 \code{EGG-INFO} 目录下；后者主要存在于源码分发包中，包括 \code{setup.py}、\code{setup.cfg} 以及 \code{pyproject.toml} 等配置文件。
+
+针对已编译分发包，InstSimulator 重点解析能够直接反映安装后文件布局与模块暴露情况的元数据文件。其中，\code{top_level.txt} 描述了软件包在安装完成后向 Python 运行时暴露的顶层模块名称，\code{SOURCES.txt} 或 \code{RECORD} 文件则刻画了分发包中源文件的完整路径集合。依赖信息在不同分发格式中的表达方式存在差异，例如在早期格式中以 \code{requires.txt} 的形式存在，而在 \code{.whl} 格式中则被统一整合进 \code{METADATA} 文件。通过对上述文件的联合分析，InstSimulator 能够在无需执行构建或安装逻辑的情况下，较为完整地恢复模块文件的空间分布关系。
+
+对于未编译的源码分发包，InstSimulator 以配置文件为主要分析对象。其系统性分析了 \code{setuptools} 体系下的核心配置机制，明确了与模块路径解析直接相关的关键参数语义，包括用于声明独立模块文件的 \code{py_modules}，用于指定包级模块集合的 \code{packages}，用于描述逻辑包名与物理路径映射关系的 \code{package_dir}，以及用于定义命名空间包结构的 \code{namespace_packages}。此外，随着 \code{pyproject.toml} 的引入，部分配置语义被进一步简化和重构，例如将命名空间包声明并入统一的包发现机制。InstSimulator 对上述配置差异进行了统一抽象，以保证不同构建系统和配置风格下的语义一致性。
+
+在解析策略上，InstSimulator 针对不同类型的元数据文件采用差异化的静态分析方法。对于静态文本文件（如 \code{requires.txt}）与结构化配置文件（如 \code{setup.cfg}），系统通过正则匹配与逐行解析的方式将其转换为统一的中间表示；对于具备可执行语义的 \code{setup.py} 文件，InstSimulator 不直接执行脚本，而是借鉴 PyCD 工具的技术思路，从抽象语法树层面开展数据流与执行流分析，精确提取与模块构建相关的函数调用及参数赋值行为，从而规避动态执行带来的不确定性与安全风险~\cite{cao2023towards}。所有解析结果最终被归一化为结构化的模块描述集合，并作为虚拟文件树建模的输入。
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figure/文件树模拟.png}
+    \caption{\label{fig:module_install_simulation}虚拟文件树模拟过程。左侧为原始分发包的物理目录拓扑，右侧为经参数解析与内存级模拟后生成的虚拟模块路径树。}
+\end{figure}
+
+\textbf{虚拟文件树模拟。}
+在完成多源异构数据的统一解析后，InstSimulator 引入了内存级虚拟文件树结构。为避免物理磁盘的全量压缩包解压开销与潜在的恶意代码执行风险，该机制采用流式读取方式，按需提取压缩包中的关键元数据与配置凭证，以重构完整的模块路径参数上下文。基于获取的目录结构，InstSimulator 在内存中实例化初始文件树，并根据流式提取配置文件和元数据文件解析取得的模块构建相关参数，精确模拟包管理器在安装阶段对文件系统执行的节点映射、重定向与剪枝操作。在完成所有参数驱动的操作模拟后，InstSimulator 应用深度优先搜索（Depth First Search，DFS）算法遍历该虚拟文件树，从根节点至叶子节点的每一条连通路径即代表一个规范化的模块路径。
+
+如图~\ref{fig:module_install_simulation}所示，以 PyGetWindow 软件包（v0.0.9）的源码分发包为例，其基于 \code{setup.py} 声明了 \code{packages = find_packages(where='src')} 参数，旨在将 \code{src} 目录下的所有子包部署至目标环境。针对该构建逻辑，InstSimulator 以 \code{setup.py} 配置文件所在目录为工作目录，运用广度优先搜索（Breadth First Search，BFS）算法在虚拟文件树中定位 \code{src} 节点，并将其子树整体重定向至虚拟安装环境的根节点之下（如图~\ref{fig:module_install_simulation}右侧所示）。随后，系统通过广度优先遍历重建后的目录拓扑结构，准确提取出该软件包预期的三条核心模块路径集合。
+
+在处理更为复杂的参数逻辑时（例如参数为 \code{package_dir = {'pugs_lib': 'pugs'}} 和 \code{packages = ['pugs_lib', 'namespace_pugs']} ），InstSimulator 会严格遵循底层构建语义进行节点模拟。其中，\code{package_dir} 记录了分发包源码目录与逻辑安装目录间的映射关系，而 packages 定义了最终需要分发的目标包列表。基于此规则，InstSimulator 首先利用 BFS 算法以配置文件所在层级为工作目录，检索 \code{package_dir} 中声明的原始节点 \code{pugs}，并将其在虚拟树中的标识修改为目标逻辑名称 \code{pugs_lib}。随后，系统执行主动剪枝，剔除所有未在 \code{packages} 参数中声明的冗余子树。通过上述语义驱动的内存级模拟，InstSimulator 在无需触发任何真实动态安装过程的情况下，构建出与实际安装结果等价的模块文件树，并输出完整且准确的模块路径集合。
 
 
-\section{ModuleGuard具体实现}
 
-\section{实验与评估}
+\subsubsection{EnvResolver 设计}
+为解决 PyPI 生态中软件包数量庞大背景下依赖图解析效率低下以及环境敏感依赖处理不充分的问题，本研究设计并实现了一种环境感知的快速依赖解析器 EnvResolver。该解析器在依赖分析过程中引入本地知识库与启发式解析顺序优化策略，同时综合考虑异构分发格式下依赖信息来源的多样性，并显式支持本地环境信息与额外依赖，从而在保证解析准确性的同时显著提升解析效率。
+
+\textbf{多维度依赖信息提取。}
+针对现有方法通常仅从单一元数据来源提取依赖信息、忽略源码包中依赖声明的问题，EnvResolver 依据 PyPI 软件包的异构性特征，采用多维度的依赖信息提取策略。具体而言，对于 \code{.whl} 类型分发包，EnvResolver 直接从 PyPI 官方 API 获取其依赖声明；对于其他格式的分发包，则依据表~\ref{tab:statistic metadata} 中所列的依赖相关文件与参数，采用与模块信息提取一致的静态分析方法，包括基于抽象语法树的数据流与执行流分析，以提取软件包的直接依赖、额外依赖及其对应的环境约束。
+考虑到同一软件包版本可能针对不同环境条件提供多种分发包，EnvResolver 会对这些分发包逐一解析，并将依赖信息统一规范化为三元组形式，即 \code{<依赖，版本约束，环境条件>}。例如，\code{requests} 软件包在 Python 版本不低于 3.11 时要求依赖 \code{numpy>=1.21.0}，而在较低版本 Python 环境下不存在该依赖关系，EnvResolver 将其统一表示为 \code{numpy>=1.21.0; (python_version >= 3.11)}。
+
+\textbf{环境信息处理。}
+在环境信息建模方面，本文通过分析 \code{pip} 源码确定了 11 类会影响依赖解析结果的本地环境因素，包括 Python 版本、操作系统名称、平台类型以及机器架构等~\cite{depspecifier}。EnvResolver 在解析过程中将上述环境信息维护于全局字典结构中。当解析到依赖项包含环境约束时，系统首先判断当前本地环境是否满足其约束条件，从而决定是否将该依赖纳入后续解析过程。此外，EnvResolver 将额外依赖视为一种特殊形式的环境条件进行统一处理。例如，在解析到 \code{pandas[compression]} 形式的依赖时，系统会在全局字典中增加键值对 \code{(compression, pandas)}，从而使额外依赖能够以与环境依赖一致的方式参与解析。
+
+\textbf{依赖图解析优化。}
+为进一步提升依赖解析效率，EnvResolver 对依赖解析顺序进行了系统性优化，以尽可能减少回溯算法的深度与回溯次数。具体而言，EnvResolver 以 \code{resolvelib} 框架作为核心回溯解析引擎，并结合本地知识库机制加速解析过程中对软件包元数据的访问~\cite{resolvelib}。得益于多维度依赖信息提取策略，EnvResolver 能够在解析前获得更为完整的依赖约束信息，包括环境依赖与额外依赖，从而降低解析过程中的不确定性。在解析顺序上，EnvResolver 采用基于优先级的启发式策略。其基本原则是，在保证解析结果不变的前提下，通过合理调整依赖处理顺序以减少回溯开销。具体而言，系统优先解析固定版本依赖，其次解析带有作用域约束的范围版本依赖，最后解析无作用域约束的依赖；同时，距离依赖图根节点较近的依赖项始终优先于远离根节点的依赖项进行解析，这样做能减少回溯深度。通过上述优化策略，EnvResolver 在大规模依赖图解析场景下显著降低了回溯次数，从而有效提升了解析效率。
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figure/ModuleGuard框架图.png}
+    \caption{\label{fig:module_framework}ModuleGuard框架图}
+\end{figure}
+\section{ModuleGuard 框架具体实现}
+本节从系统实现的角度，详细介绍本研究提出的 ModuleGuard 自动化分析与防护框架。如图~\ref{fig:module_framework} 所示，ModuleGuard 的整体工作流由三个相互衔接的核心阶段构成，分别负责元数据采集与解析、模块冲突的实证溯源与威胁建模，以及全生态规模的模块冲突检测与安全治理。
+
+第一阶段为元数据采集与解析引擎构建，其目标是对 Python 生态系统中所有可用软件包及其历史版本的元数据进行系统化提取与规范化处理，从而为后续模块冲突分析提供准确、统一且具备可扩展性的基础数据支撑。在实现层面，ModuleGuard 首先对 PyPI 官方索引中的软件包及其历史版本进行离线抓取，并依据分发格式进行分类存储。针对每一个软件包分发版本，系统分别调用 InstSimulator 与 EnvResolver，对其模块路径布局与依赖关系进行解析。解析结果被统一归一化为结构化的中间表示，包括规范化的模块路径集合以及引入环境约束后的直接依赖描述，并最终写入本地知识库。
+
+第二阶段为模块冲突模式的实证溯源与威胁建模阶段，旨在对现实世界中模块冲突现象进行细粒度刻画，深入分析其根本成因及潜在影响。本研究系统性地采集了 GitHub 与 StackOverflow 等开源社区中与模块冲突相关的真实 Issue 与讨论记录~\cite{github-website,stackoverflow-website}，并通过多维度的定性分析与归纳，对冲突实例进行抽象与总结。基于上述分析，本研究最终提炼出三类具有代表性的模块冲突模式，并进一步严格界定了其在实际应用场景中可能引发的两类核心安全威胁。
+
+第三阶段为全生态规模的模块冲突检测与安全治理阶段。在该阶段，ModuleGuard 基于前两个阶段构建的解析引擎与威胁模型，对整个 PyPI 生态仓库以及 GitHub 上的热门 AI 项目开展自动化、系统化的模块冲突扫描。通过对检测结果的统计与分析，本研究不仅量化评估了模块冲突风险在软件供应链层面的分布特征与演化趋势，还通过主动向开源社区披露潜在风险并协助开发者修复依赖配置，在 AI 软件应用层面构建了一套覆盖发现、分析与缓解的闭环防御机制。
+
+
+\textbf{元数据采集阶段。}
+该阶段构成了 ModuleGuard 框架的基础数据层，其核心目标是在大规模、动态变化的 PyPI 生态环境中，构建一个稳定、可复现且准确的模块与依赖数据库。由于 PyPI 上的软件包持续演进，不同时间点的软件包集合及其依赖关系难以直接复现，且依赖图结构随时间发生变化，本研究采用 \code{bandersnatch} 工具对 PyPI 官方仓库进行全量镜像同步~\cite{bandersnatch}。其在本地构建了约 13TB 规模的 PyPI 镜像。该镜像有效避免了在线访问带来的不稳定因素，为后续大规模离线分析提供了可控且可重复的数据基础。
+在镜像构建完成后，ModuleGuard 对每一个软件包的历史版本进行系统化解析。具体而言，系统结合 AST 数据流分析与执行流分析技术，从软件包元数据文件中提取与模块路径布局及依赖声明相关的关键信息。随后，利用 InstSimulator 对软件包的安装过程进行语义模拟，通过在虚拟文件系统中重建其安装后的目录结构，推导软件包在真实运行环境中对外暴露的模块路径。最后，系统使用 EnvResolver 对依赖声明进行高效的大规模解析，生成最终的依赖图结构，其中每一个依赖图由结点集合及其之间的依赖边构成。
+在上述过程中生成的模块路径信息与归一化后的依赖关系被统一组织为结构化中间表示，并存入 PostgreSQL 数据库中。最终，ModuleGuard 构建了一个覆盖 434,823 个软件包、约 420 万个版本的超大规模知识库。该数据库作为框架的核心数据支撑，为后续模块冲突溯源、模式建模以及全生态检测阶段提供了高效、可查询的数据基础。
+
+\textbf{模块冲突实证溯源阶段。}
+该阶段旨在从真实的软件开发实践中系统挖掘模块冲突的类型及其可能造成的影响机制，为冲突判定规则的构建提供经验依据。本研究采用滚雪球式的搜索策略，在 GitHub 与 StackOverflow 等开源社区中系统搜集与 Python 模块冲突相关的 Issue 与讨论记录。具体而言，本研究组合使用两组关键词进行笛卡尔积组合搜索，其中第一组为 \code{[module, 模块, name, namespace, 名称, 命名空间]}，第二组为 \code{[clash, conflict, overwrite, 冲突, 覆盖]}。在 GitHub Issue 搜索过程中，进一步限定条件 \code{is:issue and language:python}，以确保结果的相关性。由于 GitHub 搜索结果最多仅显示 100 页，本研究共检索并初步收集了约 4,000 条 Issue。随后，通过人工查验与筛选，最终确定其中 55 条 Issue 与模块冲突高度相关。在此基础上，进一步采用滚雪球技术，分析这些 Issue 所引用或被引用的相关讨论，最终在 GitHub 平台上共收集到 78 条与模块冲突强相关的 Issue。对于 StackOverflow 平台，本研究在关键词前引入 Python 这一限定词，并对最受关注的 200 条问题进行人工分析，最终识别出 19 个由模块冲突引发的典型问题。综上，本研究共收集并分析了 97 个与模块冲突密切相关的真实案例。基于上述实证分析结果，本研究将模块冲突形式化划分为三类：模块与标准库之间的冲突、模块与第三方软件包之间的冲突，以及依赖图内部的模块冲突。同时，进一步分析发现，这三类冲突主要导致两种严重威胁，即模块覆盖威胁与引入混淆威胁，其统计结果如表~\ref{tab:statistic issues} 所示。
+
+\begin{table}[t] 
+\renewcommand{\arraystretch}{1.5}
+\centering
+\small
+\caption{模块冲突问题的分类及其引发的威胁统计}
+\label{tab:statistic issues}
+\begin{tabular}{ccc}
+\hline
+\cellcolor[HTML]{C0C0C0}\textbf{模块冲突分类} &
+\cellcolor[HTML]{C0C0C0}\textbf{模块覆盖威胁} &
+\cellcolor[HTML]{C0C0C0}\textbf{引入混淆威胁} \\ \hline
+模块与标准库冲突（21） & -- & \checkmark \\
+\cellcolor[HTML]{EFEFEF}模块与第三方包冲突（64） & \cellcolor[HTML]{EFEFEF}\checkmark & \cellcolor[HTML]{EFEFEF}\checkmark \\
+依赖图中模块冲突（12） & \checkmark & -- \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{模块冲突检测阶段。}
+在该阶段，ModuleGuard 将前述构建的模块与依赖知识库应用于真实软件生态环境中，开展大规模的模块冲突风险分析。
+在 PyPI 生态层面，本研究首先系统收集运行环境中的系统标准库模块信息，构建包含 199 个标准库模块全集。随后，基于第一阶段构建的超大规模数据库，对 434,823 个软件包及其约 420 万个版本中声明并实际安装后的模块路径进行枚举与规范化处理，提取所有对外暴露的模块名称集合。在此基础上，ModuleGuard 分别从三个维度对模块冲突进行检测与统计。
+在此基础上，本研究进一步将分析对象扩展至热门 GitHub 应用，以评估模块冲突在高影响力项目中的实际风险暴露情况。具体而言，本研究以 GitHub 上的热门 AI 项目作为主要分析对象，根据项目的 star 数筛选出影响力最高的 3,000 个项目。此外，从 \code{awesome-Python} 项目中额外收集 1,187 个具有代表性的 Python 项目~\cite{pyawesome}。对两个来源的项目进行去重后，最终获得 3,711 个项目，涵盖 93,487 个标签。ModuleGuard 随后对这些项目的依赖配置进行系统化解析，对于每一个目标项目，系统首先基于本地 PyPI 镜像与已构建的依赖知识库，通过 EnvResolver 构建完整的依赖图结构。随后，依据第二阶段形成的冲突判定规则，自动识别潜在的模块冲突风险。在检测过程中，ModuleGuard 同时综合考虑模块覆盖关系与依赖安装导致的模块覆盖，以评估冲突在真实运行环境中的可触发性及其潜在影响范围。
+
+\section{实验评估}
+本节对 ModuleGuard 框架的核心组件进行了系统的实验分析与评估。具体而言，本研究构建了两个包含数千个真实 Python 软件包的数据集，并将其通过 \code{pip} 原生安装所得的真实结果作为基准，重点从模块提取准确性与依赖图构建准确性两个维度，对 InstSimulator 和 EnvResolution 技术进行了量化评估。
+
+\subsection{实验设置}
+\textbf{基准数据集构建。}
+鉴于 PyPI 生态系统的高动态性，现有工作提供的数据集往往难以实现可重复的精确复现。为此，本研究基于前文构建的 PyPI 全量本地镜像，通过在受控环境中执行实际安装的方式，获取具备高保真度的运行时模块路径及依赖图拓扑，以此作为测试的基准数据集。本研究共构建了以下两个数据集：
+
+\begin{itemize}
+\item \textbf{数据集 1（高频流行项目）：} 本研究交叉比对了 Libraries.io 平台中流行度最高的 3,000 个项目，以及 PyPI 官方统计表中 2022 年 8 月至 2023 年 2 月期间下载量排名前 3,000 的项目，经去重处理后构成该流行项目集。
+\item \textbf{数据集 2（全量随机抽样项目）：} 从 PyPI 生态的完整项目列表中，采用随机抽样策略选取了 5,000 个项目，作为评估框架泛化能力的基准对照集。
+\end{itemize}
+对于上述两个数据集，本研究统一选取各项目的最新版本进行基准测试。在构建基准的实际安装过程中，由于环境异构性（如部分早期包不兼容本实验的 Python 3 环境）以及安装脚本执行异常等不可控因素，部分软件包无法顺利完成构建。剔除这些无效样本后，数据集 1 与数据集 2 最终分别包含 4,232 个和 3,989 个成功安装的有效软件包。这些有效数据构成了本评估的核心测试集。
+
+\textbf{评估指标定义。}
+为细粒度量化框架的技术准确度，本研究定义了以下四个维度的评估指标：
+\begin{itemize}
+\item \textbf{正确（Correct）：} 框架解析所得的模块列表或依赖图拓扑与 \code{pip} 实际安装产生的基准结果严格相同，既无缺失也无冗余。
+\item \textbf{缺失（Missing）：} 框架解析结果未能覆盖基准结果中存在的特定模块路径、依赖节点或依赖边，存在假阴性。
+\item \textbf{多余（Excess）：} 框架解析结果中包含了基准结果中不存在的模块路径、依赖节点或依赖边，存在假阳性。
+\item \textbf{错误（Incorrect）：} 包含路径解析错误、节点命名错误及所有其他不匹配的解析失败情况。
+\end{itemize}
+
+\textbf{实验环境设置。}
+所有实验均部署于搭载 Ubuntu 22.04 操作系统的服务器上，并统一采用 \code{pip} 23.1.2 版本以确保解析逻辑的确定性。
+在获取模块路径基准时，本实验执行命令 \code{pip install <package_name> -t <target_dir> --no-dependencies}。该命令不仅将目标包强制隔离安装于指定目录，且禁用了依赖软件包的安装，从而有效消除了依赖项对目标包模块命名空间的干扰，并大幅提升了构建效率。提取路径时，本实验仅过滤并保留扩展名为 \code{.py} 的有效 Python 模块文件，自动忽略图像、文本等非代码资源文件，因其不参与 Python \code{import} 机制的命名空间解析。
+在获取依赖图基准时，本实验通过 \code{pip install -i localhost/simple} 命令将包管理器指向本地克隆的 PyPI 镜像源。为降低大规模全量安装带来的高昂系统开销，本研究通过代码分析，在 \code{pip} 核心解析器源码层面注入了钩子函数，并在钩子函数中将解析结果直接写入文件后退出。该机制使得 \code{pip} 在完成版本仲裁并生成最终依赖解析树后立即将图拓扑序列化至本地磁盘，并在此处拦截后续的物理下载与解压安装流程，从而在保证基准准确性的同时实现了轻量级的数据采集。
+\begin{table}[t]
+\renewcommand{\arraystretch}{1.5} 
+\centering
+\small
+\begin{threeparttable}
+\caption{模块和依赖解析技术评估实验结果}
+\label{tab:evaluation}
+\begin{tabular}{ccccccc}
+\toprule
+
+\cellcolor[HTML]{C0C0C0}\textbf{技术名称} & 
+\cellcolor[HTML]{C0C0C0}\textbf{测试集} & 
+\cellcolor[HTML]{C0C0C0}\textbf{正确} & 
+\cellcolor[HTML]{C0C0C0}\textbf{缺失} & 
+\cellcolor[HTML]{C0C0C0}\textbf{多余} & 
+\cellcolor[HTML]{C0C0C0}\textbf{错误} & 
+\cellcolor[HTML]{C0C0C0}\textbf{准确率} \\ \midrule
+
+\multirow{2}{*}{InstSimulator} & 数据集1 & 4,045 & 152 & 28 & 7 & 95.58\% \\
+ & \cellcolor[HTML]{EFEFEF}数据集2 & \cellcolor[HTML]{EFEFEF}3,834 & \cellcolor[HTML]{EFEFEF}116 & \cellcolor[HTML]{EFEFEF}37 & \cellcolor[HTML]{EFEFEF}2 & \cellcolor[HTML]{EFEFEF}96.11\% \\ \hline
+\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}EnvResolution\\ (节点维度)\end{tabular}} & 数据集1 & 4,177 & 41 & 8 & 13 & 98.70\% \\
+ & \cellcolor[HTML]{EFEFEF}数据集2 & \cellcolor[HTML]{EFEFEF}3,795 & \cellcolor[HTML]{EFEFEF}93 & \cellcolor[HTML]{EFEFEF}30 & \cellcolor[HTML]{EFEFEF}20 & \cellcolor[HTML]{EFEFEF}96.37\% \\ \hline
+\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}EnvResolution\\ (图维度)\end{tabular}} & 数据集1 & 4,133 & 46 & 11 & 47 & 97.66\% \\
+ & \cellcolor[HTML]{EFEFEF}数据集2 & \cellcolor[HTML]{EFEFEF}3,748 & \cellcolor[HTML]{EFEFEF}107 & \cellcolor[HTML]{EFEFEF}40 & \cellcolor[HTML]{EFEFEF}33 & \cellcolor[HTML]{EFEFEF}95.18\% \\ \bottomrule
+\end{tabular}
+
+\begin{tablenotes}
+\small
+    \item[*] 节点维度: 仅评估依赖图拓扑中节点集合的完整性与一致性。
+    \item[*] 图维度: 严格评估依赖图拓扑中节点集合与有向边集合（依赖关系）的一致性。
+    \item[*] 准确率: 正确解析的样本数占所在测试集总有效样本数的百分比。
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{评估结果与分析}
+\textbf{InstSimulator 模块提取准确性。}
+如表~\ref{tab:evaluation} 所示，InstSimulator 在流行项目（数据集 1）和随机项目（数据集 2）中的模块提取准确率分别达到了 95.58\% 和 96.11\%，这证明了其基于虚拟文件树和语义模拟的无安装提取技术具备极高的可靠性。
+针对导致精度损失的失败案例，本研究进行了深度根因分析。结果显示，InstSimulator 在两个数据集中分别出现了 152 例（3.59\%）和 116 例（2.91\%）的“缺失”判定。导致这一现象的核心瓶颈在于：InstSimulator 采用基于抽象语法树的静态数据流分析来提取 \code{setup.py} 中的配置参数，该方法难以处理包含高度动态特性或复杂控制流的安装脚本。例如，部分恶意或不规范的构建脚本通过动态字符串拼接，或在运行时读取外部自定义非标准配置文件的方式来构造模块列表，这超出了传统静态数据流分析的能力边界。此外，多分发包的不确定性亦是导致误差的原因。一个特定版本的 Python 项目在 PyPI 仓库中可能同时存在多个结构迥异的分发包，如针对不同平台编译的 \code{.whl}。由于 InstSimulator 依据内部启发式规则仅选取其中一个工件进行虚拟文件树推演，其选择可能与基准测试中 \code{pip} 基于宿主环境上下文动态选取的物理包不一致。例如，\code{jaxlib} 项目的 0.4.4 版本包含 12 个不同的分发工件，其内部的底层模块路径存在平台级差异。总体而言，InstSimulator 实现了超越 95\% 的模块高保真提取率，完全满足了对百万级生态系统进行全量安全审计的需求。
+
+\textbf{EnvResolution 依赖解析准确性。}
+为全面评估 EnvResolution 技术的鲁棒性，本实验从节点级和图级两个维度对其进行了对比测试。节点级评估侧重于验证直接依赖与传递性依赖集合的完备性（即依赖包的存在性），而图级评估则实行更严格的标准，要求依赖图有向边的约束逻辑完全同构。表~\ref{tab:evaluation} 的统计数据表明，EnvResolution 的解析准确率在两个维度上均稳定维持在 95.18\% 至 98.70\% 的高水平区间；受限于传递路径的复杂性，图级准确率符合预期地略微低于节点级。
+通过对解析失败的案例进行人工审查，本研究确认了两个主要的误差来源。首先，规避高开销的技术设计折衷带来了局部解析盲区。为了保证生态系统级别的解析速度，EnvResolution 被设计为仅从压缩包内部提取特定标准配置文件（如 \code{setup.cfg}，\code{requires.txt}）进行分析，而不执行全量解压。然而，少数非标准化项目并不直接定义参数列表，例如 \code{ta} 包的 \code{setup.py} 会强行要求读取包内部深层目录下的自定义依赖文件，这导致 EnvResolution 因没有全量解压而无法捕获该非标准配置，从而引发解析失败。其次，跨环境的元数据不同也是导致不一致的重要原因。部分依赖元数据是在项目维护者的异构本地环境中静态生成的。例如，\code{fortnitepy} 项目的元数据声明中包含三个直接依赖，但在本实验的 Linux 测试环境中，\code{pip} 原生解析器通过动态评估环境标记最终仅认定仅有其中两个依赖。总体而言，上述实验数据有力地证明了，尽管 EnvResolution 在应对高度非标准化的动态脚本与部分环境异构导致的软件包不同时存在一定局限性，但其在极大程度降低解析时间开销的同时，成功保证了面向大规模供应链分析的极高准确率。
+
+\section{实证结果分析}
+鉴于模块冲突问题在现有研究中尚未得到系统性刻画与深入分析，本小节基于对 GitHub 与 StackOverflow 上相关 Issue 的大规模收集与人工实证分析，总结并形式化定义了三类典型的模块冲突类型，并进一步归纳其可能引发的两类核心安全威胁。在此基础上，本研究对从 GitHub 收集的 420 万个软件包版本以及 3,711 个高星开源项目进行了定量评估，以系统分析模块冲突在真实生态中的存在性及其潜在影响范围，从而做到对软件应用层的防护作用。
+
+\subsection{模块冲突定义}
+通过对真实开发者反馈的归纳分析，本研究发现，在软件包发布至 PyPI 以及用户通过 \code{pip} 进行安装与依赖解析的过程中，主要存在三类模块冲突现象：模块与标准库之间的冲突、模块与第三方库之间的冲突，以及依赖图内部的软件包之间的模块冲突。为精确刻画上述冲突类型之间的差异，本文首先给出形式化符号定义如下：
+\begin{displaymath}
+\begin{aligned}
+P &: \text{表示 PyPI 上所有软件包的集合} \\
+p &: p \in P, \; \text{表示 PyPI 中某一具体软件包} \\
+M_p &: \{m \mid m \text{为软件包 } p \text{ 安装后生成的模块}\} \\
+M_{Lib} &: \{m_l \mid m_l \text{为 Python 标准库模块}\} \\
+DG(p) &: \text{表示软件包 } p \text{ 的依赖图（Dependency Graph）} \\
+m_1 \xleftrightarrow{\text{conflict}} m_2 &: m_1 \text{ 与 } m_2 \text{ 具有相同模块名称或相同模块路径}
+\end{aligned}
+\end{displaymath}
+
+\textbf{模块与标准库之间冲突。}
+模块与标准库之间冲突（Module-to-Lib）是指某一软件包在安装后生成的模块与 Python 标准库中的模块在名称上发生冲突。具体而言，若存在软件包 $p \in P$ 及其模块 $m \in M_p$，同时存在标准库模块 $m_l \in M_{Lib}$，且二者满足 $m \xleftrightarrow{\text{conflict}} m_l$，则认为该软件包存在模块与标准库之间的冲突。其形式化定义如式~\ref{equ:module_to_lib} 所示。例如，\code{python-hgijson} 在 Issue \#14 中报告，其 v1.5.0 版本包含名为 \code{json} 的模块，该模块与标准库中的 \code{json} 模块发生冲突，导致用户在导入时无法正常使用软件包功能~\cite{hgijson14}。该案例表明，即便标准库模块无法被覆盖，其命名冲突仍可能导致解释器加载路径发生歧义。
+
+\begin{equation}
+    \label{equ:module_to_lib}
+    \exists\, p \in P,\; m \in M_p \;\land\; m_l \in M_{Lib} \;\land\; m \xleftrightarrow{\text{conflict}} m_l 
+\end{equation}
+
+\textbf{模块与第三方库之间冲突。}
+模块与第三方库之间冲突（Module-to-TPL）指两个不同软件包之间存在同名或同路径模块冲突。形式化而言，若存在 $p, p' \in P$ 且 $p \neq p'$，并分别存在 $m \in M_p$ 与 $m' \in M_{p'}$ 满足 $m \xleftrightarrow{\text{conflict}} m'$，则认为软件包 $p$ 与 $p'$ 之间存在模块冲突。其定义如式~\ref{equ:module_to_tpl} 所示。例如，在 \code{Cookiecutter-udata-plugin} 项目的 Issue \#3 中指出，\code{python-slugify}（v8.0.0）与 \code{awesome-slugify}（v1.6.5）均包含名为 \code{slugify.py} 的模块。当二者被安装于同一运行环境时，将发生冲突并导致其中一个软件包功能异常~\cite{udataplugin3}。
+
+\begin{equation}
+    \label{equ:module_to_tpl}
+    \exists\, p, p' \in P,\; p \neq p' \;\land\; m \in M_p \;\land\; m' \in M_{p'} \;\land\; m \xleftrightarrow{\text{conflict}} m'
+\end{equation}
+
+\textbf{依赖图内部软件包之间的模块冲突。}
+依赖图内部软件包之间的模块冲突（Module-in-Dep）是指在某一根软件包 $r$ 的依赖图 $DG(r)$ 中，存在两个不同依赖包 $p$ 与 $p'$，且其模块 $m \in M_p$ 与 $m' \in M_{p'}$ 之间发生冲突。此时，即便根软件包本身未直接声明冲突模块，其整体依赖结构仍可能引发冲突风险。其形式化定义如式~\ref{equ:module_in_dep} 所示。例如，在项目 \code{emoca} 的 Issue \#44 中指出，其 v1.0 版本的依赖图同时包含 \code{opencv-python}（v4.5.5）与 \code{opencv-python-headless}（v4.5.5）。由于二者均包含 \code{cv2} 模块，导致依赖图内部产生模块冲突，从而影响根项目的正常运行~\cite{emocaissue44}。该类冲突具有较强隐蔽性，尤其在间接依赖情形下，开发者往往难以感知其存在。
+
+\begin{equation}
+    \label{equ:module_in_dep}
+    \exists\, (p, p') \subseteq DG(r),\; p \neq p', \; 
+    m \in M_p \;\land\; m' \in M_{p'} \;\land\; m \xleftrightarrow{\text{conflict}} m'
+\end{equation}
+
+\subsection{模块冲突影响与新型攻击面}
+基于对 97 个真实 Issue 的系统化实证分析，本小节进一步归纳 Python 生态在代码管理机制层面存在的两项结构性缺陷。在此基础上，本文提出一种面向软件应用层的潜在攻击范式——模块替换攻击。该攻击并非依赖传统漏洞利用，而是借助模块命名冲突与加载优先级机制，在合法安装流程中实现模块替换，从而影响程序语义与执行结果。
+
+首先，Python 采用统一的模块导入语法 \code{import}，允许从标准库、第三方库以及项目自身目录中加载模块。然而，解释器在解析导入请求时遵循首次匹配即停止策略，即先次查询 \code{sys.modules} 中的缓存记录，再按照 \code{sys.path} 中记录的模块路径顺序，一项项查找，而未对模块来源进行显式区分。该机制导致当不同位置存在同名或同路径模块时，解释器可能加载与开发者预期不一致的模块，从而引发导入混淆威胁。
+其次，\code{pip} 默认将来自 PyPI 的第三方库统一安装至 \code{site-packages} 目录，且不同软件包之间缺乏物理隔离机制。虽然虚拟环境可以隔离不同项目之间的依赖版本，但在单一项目内部，直接依赖与间接依赖仍被混合存储于同一目录层级。当存在同名或同路径模块时，后安装模块可能覆盖先前模块，从而引发模块覆盖威胁。
+上述两类机制性缺陷分别作用于软件包的安装、升级与运行阶段，对项目依赖完整性与运行可靠性构成严重威胁。下文结合典型案例，对两类威胁进行详细分析。
+
+\textbf{威胁一：模块覆盖。}
+模块覆盖威胁源于 Python 生态缺乏包级物理隔离机制。在默认安装模式下，不同软件包的模块被写入同一 \code{site-packages} 目录。当两个原本无直接关联的软件包包含相同相对路径的模块时，后安装模块将覆盖先安装模块，从而破坏项目的依赖完整性与功能一致性。该威胁主要由模块与第三方库之间冲突以及依赖图内部模块冲突触发。
+
+在模块与第三方库之间冲突场景下，\code{pip} 并不会对不同软件包进行命名空间级别隔离。例如，在 \code{pypa/pip} 项目的 Issue \#4625 中，开发者同时安装 \code{pyjwt}（v1.5）与 \code{jwt}（v0.5.2），二者在 \code{jwt/exceptions.py} 模块上发生冲突。由于安装顺序差异，后安装的软件包覆盖先前模块，导致运行时行为异常~\cite{pip4625}。该案例表明，即便两个软件包功能不同，只要存在同路径模块，其并存即可能破坏项目运行环境。
+在大小写不敏感（Case-Insensitive）的文件系统环境（如 Windows）中，该问题进一步加剧。文件系统对目录名不区分大小写，导致不同命名的模块可能被解析为同一物理路径。例如，在 \code{pycrypto} 项目的 Issue \#156 中，开发者先安装 \code{crypto}（小写），随后安装包含 \code{Crypto}（大写）目录的 \code{pycrypto}。由于文件系统无法区分大小写，\code{pip} 无法创建新的 \code{Crypto} 目录，而是将模块写入既有的 \code{crypto} 目录中，不仅覆盖原有模块，而且改变模块层级结构，导致所有 \code{import Crypto} 语句失效，最终破坏项目功能~\cite{pip156}。该现象表明，模块冲突与底层文件系统特性存在一定关联，从而扩大了威胁影响范围。
+
+在依赖图内部冲突情形下，模块覆盖通常发生于直接依赖与间接依赖之间。例如，在 \code{Albumentations} 项目的 Issue \#841 中，项目同时依赖 \code{opencv-python}（间接依赖）与 \code{opencv-python-headless}（直接依赖），二者在 \code{cv2} 模块上存在冲突~\cite{albumentations841}。尽管官方文档已明确指出两者不可同时安装，但由于间接依赖对开发者而言缺乏可见性，其安装过程具有“黑盒”特征，冲突仍可能在自动依赖解析过程中被触发~\cite{opencv}。
+此外，模块覆盖亦可能在软件升级阶段产生。例如，在 Issue \#8509 中，\code{ansible@2.9.10} 升级后出现文件缺失问题。其根本原因在于 \code{pip} 的升级流程包括：首先安装新版本依赖（期间可能发生模块覆盖），随后卸载旧版本（可能误删已被覆盖的新模块，因为系统将其识别为旧版本文件），最后安装新版本主包。该过程破坏了文件一致性，导致软件包完整性受损~\cite{pip8509}。该案例说明，模块覆盖不仅影响安装阶段，还可能在版本更新过程中存在风险。
+
+\textbf{威胁二：导入混淆。}
+导入混淆威胁源于 Python 导入解析机制未区分模块来源，而是基于优先级顺序进行匹配。当存在同名模块时，解释器可能加载与开发者预期不一致的模块，从而改变程序语义。
+
+在模块与标准库冲突场景下，标准库模块虽然物理上独立存储且无法被覆盖，但若第三方库或项目自身模块与标准库同名，解释器可能优先加载缓存或系统路径中的标准库模块。例如，项目 \code{FibexConverter} 包含名为 \code{parser.py} 的模块，但运行时却被解析为标准库中的 \code{parser} 模块~\cite{fibexConverter7}。这是由于 Python 启动时已将部分标准库模块缓存于 \code{sys.modules} 全局变量中，当执行 \code{import parser} 时，解释器首先查询缓存并直接返回已加载模块，从而导致项目模块未被正确导入。进一步地，当用户首先加载与标准库同名的第三方模块时，该模块将被写入 \code{sys.modules} 缓存。此后，即使开发者希望调用标准库模块，解释器仍可能返回已缓存的第三方模块，从而导致内置功能异常，严重情况下可能影响 Python 解释器的正常执行流程。
+
+在模块与第三方库冲突情形下，解释器按照 \code{sys.path} 中路径顺序进行搜索，并在首次匹配后停止。当冲突模块位于不同目录时，实际加载结果依赖路径排列顺序。这要求开发者精确控制运行环境配置，否则极易产生不可预测行为。尽管命名空间包机制在一定程度上缓解了模块覆盖问题，但其并未解决由加载优先级带来的导入歧义风险。
+此外，Python 支持多种安装方式，不同工具具有不同默认路径。例如，通过 \code{apt-get} 安装的模块位于 \code{/usr/} 目录，通过 \code{pip} 安装的模块位于 \code{site-packages/}，而 \code{conda} 与 \code{poetry} 等工具则维护独立环境路径。多路径共存的生态结构显著增加了模块搜索空间的复杂性，使得导入优先级问题更加难以预测，从而扩大了导入混淆攻击面的潜在影响范围。
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figure/模块替换攻击示意.png}
+    \caption{\label{fig:module_attack}模块替换攻击原理图}
+\end{figure}
+
+\textbf{模块替换攻击。}
+如~\autoref{fig:module_attack} 所示，模块替换攻击的核心原理在于利用 \code{pip} 在安装软件包时对同名模块的覆盖行为。当目标环境中已存在某一模块，而新安装的软件包中包含相同模块路径的文件时，后安装模块将在默认配置下直接覆盖原有模块，且整个过程对用户缺乏显式提示与风险告警。在此机制下，攻击者无需利用传统漏洞，仅通过构造特定命名与依赖关系，即可实现对既有模块的语义替换。
+具体而言，攻击者可以构造一个包含高频模块名称的恶意软件包并上传至 PyPI。例如，在恶意软件包中包含名为 \code{requests.py} 的模块，并在其中嵌入经过混淆处理的恶意代码。当用户在本地环境中安装该软件包后，若其模块路径与现有合法模块发生冲突，则原有模块可能被替换。攻击者可通过多种方式诱导用户下载该恶意软件包。
+
+首先，攻击者可以采用名称混淆策略，例如使用 \code{requests-latest} 等具有误导性的名称，伪装为 \code{requests} 软件包的最新更新版本。其次，可以利用拼写近似攻击，上传常用软件包相似名字，在用户拼写错误软件包名称时触发误下载。再次，攻击者可以利用 Python 报错提示机制。当解释器在缺失模块时报出 \code{ModuleNotFoundError: No module named xxx} 错误时，部分开发者可能误将缺失模块名视为软件包名称并直接执行 \code{pip install xxx}。例如，实际所需软件包为 \code{opencv-python}，但报错信息显示缺少 \code{cv2} 模块，攻击者若提前发布名为 \code{cv2} 的恶意软件包，即可能诱导用户执行 \code{pip install cv2} 并下载恶意代码。
+此外，攻击者亦可发布表面功能正常的软件包，但在其依赖配置文件（如 \code{requirements.txt} 或 \code{setup.py}）中引入恶意依赖项。由于 \code{pip} 在安装软件包时会自动解析并下载其依赖，该机制可被滥用于间接分发恶意模块。在上述任一情形下，一旦恶意软件包被安装，其模块文件将写入本地 \code{site-packages} 目录，并可能覆盖原有良性模块。
+
+当用户后续通过 \code{import} 语句加载相关模块时，解释器将优先执行已被替换的恶意代码，从而在用户无感知的情况下触发攻击行为。该类攻击具有隐蔽性强、触发条件自然、执行路径合法等特征，难以通过传统漏洞扫描或异常检测机制发现。同时，当前 PyPI 生态在恶意软件包检测与主动下架机制方面仍存在局限，使得此类攻击在现实供应链环境中具有可行性与持续性风险。
+
+\subsection{PyPI 生态大规模检测结果}
+本小节基于 ModuleGuard 框架，对 PyPI 生态系统中的模块冲突问题开展了大规模实证检测分析。研究对象覆盖截至 2023 年 3 月发布的 420 余万个 PyPI 软件包版本，系统性评估了三类模块冲突模式在真实生态中的分布特征与演化趋势。
+
+针对模块与第三方库冲突，考虑到同一项目的不同版本无法在同一运行环境中并存，且在未显式指定版本约束的情况下 \code{pip} 默认安装最新版本，本研究仅提取每个项目截至 2023 年 3 月的最新版本进行分析。在识别出存在冲突的软件包后，假设这些软件包在实际应用场景中可能被同时安装于同一环境，从而评估其潜在冲突风险。
+针对模块与标准库冲突，本研究首先依据 Python 官方文档收集了 199 个标准库模块名称，并据此对全生态软件包的模块命名进行匹配分析~\cite{pylibdocumentation}。鉴于真实用户环境中 \code{sys.path} 的优先级配置及标准库加载状态具有不确定性，本研究采用保守假设：即 199 个标准库模块在用户环境中均可用，且已被加载至解释器缓存（\code{sys.modules}）中，从而评估最坏情况下的导入混淆风险。
+针对依赖图内部冲突，本研究对每个项目的所有历史版本进行全面解析，并利用 Envresolver 技术构建其完整依赖图。在获得传递性依赖关系后，逐一检查依赖节点对应的软件包文件结构，判断是否存在同路径模块冲突或内容不一致的同名模块。
+
+总的来说，本研究分析数量级为从 PyPI 提取 4,223,950 个软件包版本，解析得到 177,216,363 条模块路径及 27,678,668 条直接依赖声明，并成功构建 4,223,950 个完整依赖图。其中，处于最新版本的软件包数量为 424,823 个，共涉及 5,419,306 条模块路径。
+
+\begin{table}[t]
+\small
+\centering
+\renewcommand{\arraystretch}{1.5}
+\caption{软件包中冲突频率最高的前 10 个模块路径}
+\label{tab:Top 10 module paths}
+\begin{tabular}{lcc}
+\hline
+\multicolumn{1}{c}{模块路径}      & 最新版本包数量  & 所有版本包数量\\ \hline
+src/\_\_init\_\_.py                   & 1,157               & 8,777\\
+\_\_init\_\_.py                       & 1,083               & 4,421\\
+utils/\_\_init\_\_.py                 & 410                & 3,899\\
+distributions/\_\_init\_\_.py         & 404                & 448\\
+distributions/Generaldistribution.py  & 394                & 431\\
+distributions/Gaussiandistribution.py & 394                & 431\\
+distributions/Binomialdistribution.py & 393                & 428\\
+client/\_\_init\_\_.py                & 367                & 1,142\\
+scripts/\_\_init\_\_.py               & 363                & 5,336\\ 
+server/\_\_init\_\_.py               & 360                & 796\\ \hline
+\end{tabular}
+
+\end{table}
+
+\textbf{模块与第三方库冲突分析。}
+针对 424,408 个最新版本项目的量化评估结果表明，共有 91,134 个软件包（占比 21.45\%）存在模块与第三方库冲突，涉及 386,595 条模块路径（占总模块数 5,419,306 的 7.13\%）。根据这些软件包是否被安装至相同目标路径，其冲突可能演化为模块覆盖或导入混淆威胁。
+进一步分析发现，在 27,851 个软件包（占比 6.56\%）中，冲突模块位于大小写不敏感的文件系统环境下可能被解析为相同路径，共牵涉 3,517 条模块路径。这表明底层文件系统特性会进一步放大模块覆盖风险。
+
+研究发现，开发者在发布软件包时，往往将运行时非必需的冗余模块一并打包。例如，包含测试模块（如 \code{test(s)/__init__.py}）的软件包多达 41,095 个，包含示例模块（如 \code{example(s)/__init__.py}）的软件包达 14,877 个。这些模块通常仅用于本地开发或调试阶段，将其分发至生产环境不仅增加命名空间污染风险并诱发导入错误，还额外占用仓库存储资源。
+更为重要的是，在依赖解析阶段，这些冗余元数据会显著扩大回溯算法在回溯时下载软件包的大小，从而增加 \code{pip} 在复杂依赖场景下的解析时间开销，降低整体安装效率。
+
+如表~\ref{tab:Top 10 module paths} 所示，本研究识别出生态中冲突频率最高的前 10 个模块路径。其中，超过 1,000 个最新版本软件包包含缺乏明确功能语义的 \code{src/__init__.py} 与 \code{__init__.py} 文件。该现象主要源于开发者对 \code{src-layout} 与 \code{flat-layout} 目录结构配置不当，导致初始化文件被错误地置于项目根目录并随包一并分发~\cite{docsertuparg}。
+
+此外，本研究观察到，存在模块冲突的软件包在命名上往往具有较高语义相似性。例如，在包含 \code{distributions/__init__.py} 模块的 404 个软件包中，有 290 个项目名称包含 \code{distribution} 子串。这表明功能相近或处于同一领域功能的软件包更有可能被终端用户组合使用，从而显著提高实际环境中冲突触发的概率。
+通过对相关 GitHub Issue 的进一步挖掘，本研究发现，即便维护者意识到其模块命名与其他流行库存在冲突，通常也不愿主动重命名。原因在于核心模块重命名将破坏向后兼容性，引发大规模重构，并增加用户开发成本和下游用户的使用更新成本。
+
+\textbf{模块与标准库冲突分析。}
+在对 420 万个软件包的全量扫描中，共识别出 345,068 个软件包（占比 8.17\%）存在模块与标准库冲突。在 199 个标准库模块中，有 182 个（占比 91.96\%）至少与一个第三方软件包发生重名。冲突频率最高的三个标准库模块分别为 \code{types}、\code{io} 与 \code{logging}，分别涉及 69,940、47,214 和 35,694 个第三方软件包。
+
+研究揭示，本地开发环境与实际部署环境之间的路径优先级差异是引发此类导入混淆的重要因素。在本地调试阶段，当前工作目录通常在 \code{sys.path} 中具有较高优先级；而当项目被打包并通过 \code{pip} 安装后，其模块所在的 \code{site-packages} 目录优先级低于系统标准库。这种优先级反转可能导致在开发环境中开发者加载的是本地开发目录下的模块，而在用户部署环境中，其加载的是标准库模块，而非预期的第三方模块，从而引发运行时异常。为解决该问题，开发者通常采取模块重命名或使用相对导入等方式。然而，这些方案可能破坏向后兼容性，并降低代码的可读性与跨平台可移植性。
+
+如图~\ref{fig: Libtimestamp}所示是历年发布的软件包总数与存在模块冲突的软件包数量统计图，其结果表明模块与标准库冲突的软件包数量呈逐年增长趋势。随着 Python 生态规模的持续扩张及标准库功能的不断丰富，该类冲突已演化为一种长期存在且不断累积的供应链风险。
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figure/模块冲突统计图.png}
+    \caption{历年发布的软件包总数与存在模块冲突的软件包数量统计}
+    \label{fig: Libtimestamp}
+\end{figure}
+
+\textbf{依赖图内部冲突分析。}
+对 420 万个软件包的依赖图拓扑分析显示，共有 129,840 个软件包（占比 3.07\%）存在依赖图内部冲突，涉及 11,666 个项目。其中，38,371 个软件包（关联 4,516 个项目）在依赖树中存在路径完全相同但文件内容哈希值不同的冲突模块。这种情况在 \code{pip} 安装软件包时会自定触发覆盖行为引发功能异常。
+部分冲突模块会随着上游依赖版本迭代而发生内容变更，从而在下游系统中形成潜在功能退化风险。即便某些冲突模块在当前主执行路径中未被直接调用，其静态覆盖行为已破坏软件包的物理完整性。在复杂 AI 系统中，无法保证这些模块不会在未来版本或异常处理分支中被触发。
+
+对冲突项目供应链关系的深入分析表明，依赖图内部冲突主要源于三类根因：其一，不同维护者实现相似功能的竞争性软件包采用相同或相近模块命名，在同时作为间接依赖引入时产生命名空间重叠，例如，在 \code{saleor} 的依赖图中，\code{python-magic-bin} 是 \code{python-magic} 的一个由不同维护者维护的分支；其二，生态演进过程中的包名迁移，即旧项目被弃用后由新名称的分支替代，在过渡期被不同组件分别依赖，例如在 \code{riffusion} 项目中，\code{soundfile} 是 \code{pysoundfile} 的演进重命名版本；其三，同一项目的不同变种或面向不同环境的分发版本被同时引入依赖树，例如 \code{opencv-python} 与 \code{opencv-python-headless} 则是 \code{opencv} 分别面向桌面GUI与服务器环境的两个互相冲突的平行分发版。
+
+此外，冲突在项目生命周期中表现出显著的潜伏性。在 4,516 个明确存在内容冲突的项目中，冲突集中分布于早期连续版本区间（2,342 个项目）或贯穿全部历史版本（1,819 个项目）。统计结果显示，此类未决冲突平均跨越 6.5 个版本发布周期。该现象表明，维护者往往仅在出现显性功能故障后才进行修复，而大量冲突在未触发异常的情况下长期潜伏，削弱系统整体可靠性。例如，\code{aniposelib} 项目在 0.3.7 版本之前长期处于 \code{opencv-python} 与 \code{opencv-contrib-python} 的依赖冲突状态中，直至终端用户在 Issue 中报告了由依赖图内部冲突引发的严重运行时错误后，维护者才在后续版本中予以纠正~\cite{aniposelib}。如图~\ref{fig: Libtimestamp}从时间维度观察，依赖图内部冲突的受影响项目数量亦呈增长趋势。部分早期发布时依赖结构健康的软件包，在上游依赖迁移、分裂或废弃后，重新解析时触发新的依赖图中模块冲突问题，这一现象凸显了软件供应链依赖关系的长期脆弱性与动态退化特征。
+
+\begin{table}[t]
+\centering
+\small % 如果版面紧张，可以改为 \footnotesize
+\renewcommand{\arraystretch}{1.4} % 稍微拉开行距，提升阅读体验
+\caption{向 GitHub 开源社区报告的模块冲突漏洞工单及修复状态}
+\label{tab:reported_issues}
+\begin{tabular}{@{} l l c c @{}}
+\toprule
+\textbf{开源项目} & \textbf{工单号} & \textbf{已回复} & \textbf{已修复} \\ \midrule
+wzpan/wukong-robot & \href{https://github.com/wzpan/wukong-robot/issues/286}{\#286} & $\checkmark$ & - \\
+RVC-Project/Retrieval-based-Voice-Conversion-WebUI & \href{https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/issues/908}{\#908} & - & $\checkmark$ \\
+google/BIG-bench & \href{https://github.com/google/BIG-bench/issues/946}{\#946} & - & - \\
+google-research/text-to-text-transfer-transformer & \href{https://github.com/google-research/text-to-text-transfer-transformer/issues/1106}{\#1106} & - & - \\
+asyml/texar & \href{https://github.com/asyml/texar/issues/303}{\#303} & - & - \\
+invoke-ai/InvokeAI & \href{https://github.com/invoke-ai/InvokeAI/issues/4078}{\#4078} & $\checkmark$ & $\checkmark$ \\
+Picsart-AI-Research/Text2Video-Zero & \href{https://github.com/Picsart-AI-Research/Text2Video-Zero/issues/63}{\#63} & - & - \\
+sail-sg/EditAnything & \href{https://github.com/sail-sg/EditAnything/issues/51}{\#51} & $\checkmark$ & $\checkmark$ \\
+AIGC-Audio/AudioGPT & \href{https://github.com/AIGC-Audio/AudioGPT/issues/89}{\#89} & - & - \\
+Sygil-Dev/sygil-webui & \href{https://github.com/Sygil-Dev/sygil-webui/issues/1808}{\#1808} & - & - \\
+riffusion/riffusion & \href{https://github.com/riffusion/riffusion/issues/151}{\#151} & $\checkmark$ & $\checkmark$ \\
+Anjok07/ultimatevocalremovergui & \href{https://github.com/Anjok07/ultimatevocalremovergui/issues/702}{\#702} & $\checkmark$ & $\checkmark$ \\
+pjialin/py12306 & \href{https://github.com/pjialin/py12306/issues/454}{\#454} & - & - \\
+PaddlePaddle/PaddleSpeech & \href{https://github.com/PaddlePaddle/PaddleSpeech/issues/3432}{\#3432} & $\checkmark$ & $\checkmark$ \\
+marqo-ai/marqo & \href{https://github.com/marqo-ai/marqo/issues/556}{\#556} & $\checkmark$ & $\checkmark$ \\
+nbei/Deep-Flow-Guided-Video-Inpainting & \href{https://github.com/nbei/Deep-Flow-Guided-Video-Inpainting/issues/113}{\#113} & - & - \\
+saleor/saleor & \href{https://github.com/saleor/saleor/issues/13554}{\#13554} & - & $\checkmark$ \\
+jantic/DeOldify & \href{https://github.com/jantic/DeOldify/issues/482}{\#482} & $\checkmark$ & $\checkmark$ \\
+PaddlePaddle/PaddleRec & \href{https://github.com/PaddlePaddle/PaddleRec/issues/940}{\#940} & - & - \\
+kohya-ss/sd-scripts & \href{https://github.com/kohya-ss/sd-scripts/issues/684}{\#684} & $\checkmark$ & $\checkmark$ \\
+bmaltais/kohya\_ss & \href{https://github.com/bmaltais/kohya_ss/issues/1267}{\#1267} & $\checkmark$ & $\checkmark$ \\
+sensity-ai/dot & \href{https://github.com/sensity-ai/dot/issues/98}{\#98} & $\checkmark$ & $\checkmark$ \\
+chatchat-space/Langchain-Chatchat & \href{https://github.com/chatchat-space/Langchain-Chatchat/issues/952}{\#952} & $\checkmark$ & $\checkmark$ \\
+PaddlePaddle/PaddleOCR & \href{https://github.com/PaddlePaddle/PaddleOCR/issues/10490}{\#10490} & - & - \\
+microsoft/TaskMatrix & \href{https://github.com/microsoft/TaskMatrix/issues/434}{\#434} & - & - \\
+weecology/DeepForest & \href{https://github.com/weecology/DeepForest/issues/464}{\#464} & $\checkmark$ & $\checkmark$ \\
+OpenGVLab/InternGPT & \href{https://github.com/OpenGVLab/InternGPT/issues/53}{\#53} & - & - \\
+Rudrabha/Wav2Lip & \href{https://github.com/Rudrabha/Wav2Lip/issues/536}{\#536} & - & - \\
+lucasjinreal/weibo\_terminater & \href{https://github.com/lucasjinreal/weibo_terminater/issues/62}{\#62} & - & - \\
+airbnb/streamalert & \href{https://github.com/airbnb/streamalert/issues/1345}{\#1345} & - & - \\
+jupyter/jupyter\_core & \href{https://github.com/jupyter/jupyter_core/issues/350}{\#350} & $\checkmark$ & $\checkmark$ \\
+microsoft/TaskMatrix & \href{https://github.com/microsoft/TaskMatrix/issues/345}{\#345} & - & - \\
+qpzzk/zz\_spider & \href{https://github.com/qpzzk/zz_spider/issues/1}{\#1} & - & - \\
+NickHugi/PyKotor & \href{https://github.com/NickHugi/PyKotor/issues/3}{\#3} & $\checkmark$ & $\checkmark$ \\ \bottomrule
+\end{tabular}
+\end{table}
+\subsubsection{GitHub 热门项目检测结果}
+本研究选取 GitHub 平台中具有较高影响力的开源 Python 项目开展系统性实证分析，检测其中潜伏的依赖图内部冲突。
+实验结果显示，共有 519 个项目（占比 13.93\%）的 10,850 个版本标签（占比 11.61\%）存在模块覆盖风险。相较于 PyPI 生态的宏观统计结果，依赖图内部冲突在 GitHub 实际工程项目中的发生比例更高。其原因在于，面向真实应用场景的项目通常构建了更为复杂且规模更大的依赖拓扑结构，因而更易产生传递性的模块命名空间重叠。即便覆盖前后模块文件的内容哈希值一致，在语义层面未直接引发显性运行时异常，这类静默覆盖行为仍会破坏本地环境中软件包的物理完整性，并显著增加环境异常的定位与调试难度，因为并没法保证后续该文件是否会在某一个版本进行修改，从而诱发潜在威胁。
+
+进一步分析表明，在 108 个项目的 2,569 个版本标签中，覆盖前后模块文件存在实质性内容差异，从而带来直接的功能性错误风险。在这 108 个受影响项目中，有 65 个项目的最新版本仍遗留该隐患，其余 43 个项目则在后续版本迭代中完成了修复。统计结果显示，每个未修复冲突平均跨越 23 个历史版本，反映出该类问题具有显著的潜伏期与隐蔽性。通常仅当终端用户在特定执行路径下触发显性崩溃并提交错误报告后，维护者才会意识到冲突的存在并采取修复措施。针对上述 65 个包含未决冲突的最新版本项目，本研究开展了细粒度人工代码审计，并向相关维护者提交了 35 个安全漏洞工单（因为部分项目的冲突原因相同，因此本研究向依赖的维护者提交工单而非项目本身维护者）。截至目前，已有 15 个项目团队作出正式回应，其中 16 个项目已得到肯定回复并进行了修复以消除模块冲突（部分项目静默修复了问题，并未回复工单）。对于尚未回应的项目，鉴于其冲突触发机制与已确认问题在结构上完全同构，本研究合理推断，这些遗留冲突同样可能对受限系统环境造成实质性的功能破坏。
+
+实证分析显示，模块冲突问题在 AI 相关项目中呈现出显著高发态势。其典型诱因源于底层计算机视觉库的交叉依赖。开发者在构建 AI 系统时，通常显式声明依赖四种 \code{opencv-python} 变体发行版中的某一版本，同时还会引入其他 AI 相关第三方组件。然而，这些组件在其传递性依赖树中往往再次声明其他互斥版本的 \code{opencv} 基础库，例如\code{opencv-python-headless}。尽管官方文档已明确指出这些变体共享同一 \code{cv2} 模块命名空间，无法在同一运行环境中共存，但此类冲突在实际工程中仍广泛存在~\cite{opencv}。其根本原因在于，应用层开发者通常只能显式约束直接依赖，而对传递性依赖缺乏可见性与控制能力。由此产生的底层命名空间重叠，直接导致多个 AI 衍生项目在同一生产环境集成部署时出现严重的不兼容与环境破坏问题。
+
+研究进一步发现，部分开发者在顶层依赖中同时引入功能重叠且存在模块级冲突的软件包。通过与开源社区维护者的沟通，本研究观察到一种风险较高的开发模式，即当开发者遭遇由底层模块覆盖引发的异常行为时，往往通过增加新的依赖项以期“覆盖”原有环境或缓解错误，而非从依赖拓扑结构层面定位冲突根因。这种做法表明，部分开发实践过度关注程序是否能够暂时运行，而忽视了依赖图结构的健康性与文件系统层面的完整性约束。引入功能冗余依赖不仅显著提升工程复杂度，也增加了下游用户在构建与部署环境时的失败概率。大量项目 Issue 讨论记录进一步表明，开发者普遍缺乏对“模块冲突”这一系统级架构缺陷的整体认知。多数修复行为依赖反复试错机制，通过增删依赖配置维持程序的脆弱可运行状态。实证数据亦支持该观察：在本研究追踪的 16 个已确认修复的最新版本项目中，有 12 个项目的最终修复方案仅为移除冗余依赖声明。综上所述，本研究的量化分析揭示了模块冲突在软件供应链内部的传播机制与潜在破坏路径，并为开发者在开发与调试阶段规范依赖声明、识别环境风险及提升供应链稳健性提供了实证基础。
 
 \section{本章小节}
+
+
+

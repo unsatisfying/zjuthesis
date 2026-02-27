@@ -169,8 +169,11 @@
     \inputbody{post}
 }
 
-% \usepackage{inconsolata} % code 字体等宽
+% \usepackage{url}
+% \newcommand{\code}[1]{{\ttfamily\url{#1}}}
+% % \usepackage{inconsolata} % code 字体等宽
 \newcommand{\code}[1]{{\texttt{\small{\detokenize{#1}}}}}
+
 \begin{document}
 
 \ifthenelse{\equal{\Degree}{undergraduate}}
