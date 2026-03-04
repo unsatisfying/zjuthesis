@@ -1172,3 +1172,191 @@ series = {EuroSec'25}
   url = {https://github.com/lambdaloop/anipose/issues/22},
   lastaccessed = {March 10, 2023}
 }
+
+@inproceedings{pickleball,
+author = {Kellas, Andreas D. and Christou, Neophytos and Jiang, Wenxin and Li, Penghui and Simon, Laurent and David, Yaniv and Kemerlis, Vasileios P. and Davis, James C. and Yang, Junfeng},
+title = {PickleBall: Secure Deserialization of Pickle-based Machine Learning Models},
+year = {2025},
+isbn = {9798400715259},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3719027.3765037},
+doi = {10.1145/3719027.3765037},
+abstract = {Machine learning model repositories, such as the Hugging Face Model Hub, facilitate model exchanges. However, bad actors can deliver malware through compromised models. Existing defenses, such as safer model formats, restrictive (but inflexible) loading policies, and model scanners, have shortcomings: 44.9\% of popular models on Hugging Face still use the insecure pickle format, 15\% of these cannot be loaded by restrictive loading policies, and model scanners have both false positives and false negatives. Pickle remains the de facto standard for model exchange, and the ML community lacks a tool that offers transparent safe loading.We present PickleBall to help machine learning engineers load pickle-based models safely. PickleBall statically analyzes the source code of machine learning libraries and computes custom policies that specify a safe load-time behavior for benign models. It then dynamically enforces these policies during load time as a drop-in replacement for the pickle module. PickleBall generates policies that correctly load 79.8\% of benign pickle-based models in our dataset, while rejecting all (100\%) malicious examples in the same dataset. In comparison, evaluated model scanners fail to identify known malicious models, and the state-of-the-art loader loads 22\% fewer benign models than PickleBall. PickleBall removes the threat of arbitrary function invocation from malicious pickle-based models, raising the bar for attackers as they have to depend on code reuse techniques.},
+booktitle = {Proceedings of the 2025 ACM SIGSAC Conference on Computer and Communications Security},
+pages = {3341–3355},
+numpages = {15},
+keywords = {deserialization attacks, secure model loading, supply chains},
+location = {Taipei, Taiwan},
+series = {CCS '25}
+}
+
+@misc{liu2025art,
+  title={The Art of Hide and Seek: Making Pickle-Based Model Supply Chain Poisoning Stealthy Again},
+  author={Liu, Tong and Meng, Guozhu and Zhou, Peng and Deng, Zizhuang and Yao, Shuaiyin and Chen, Kai},
+  year={2025},
+  eprint={2508.19774},
+  archivePrefix={arXiv},
+  primaryClass={cs.CR},
+  doi={10.48550/arXiv.2508.19774},
+  url={https://arxiv.org/abs/2508.19774},
+  keywords={Cryptography and Security, Artificial Intelligence, Software Supply Chain Security}
+}
+
+@article{tan2025saser,
+  title={SASER: Stego Attacks on Open-Source LLMs},
+  author={Tan, Ming and Li, Wei and Tao, Hu and Ma, Hailong and Liu, Aodi and Chen, Qian and Wang, Zilong},
+  year={2025},
+  eprint={2510.10486},
+  archivePrefix={arXiv},
+  primaryClass={cs.CR},
+  doi={10.48550/arXiv.2510.10486},
+  url={https://arxiv.org/abs/2510.10486},
+  keywords={Steganography, Adversarial Attacks, Large Language Models, Model Security, Quantization Robustness}
+}
+
+@misc{huggingface2022pickle,
+title={Pickle Scanning},
+author={{Hugging Face}},
+howpublished={\url{https://huggingface.co/docs/hub/security-pickle}},
+year={2022},
+note= {Accessed: 2024-06-04}
+}
+
+@misc{montalbano2024hugging,
+author = {Elizabeth Montalbano},
+title = {Hugging Face AI Platform Riddled With 100 Malicious Code-Execution Models},
+year = {2024},
+url = {https://www.darkreading.com/application-security/hugging-face-ai-platform-100-malicious-code-execution-models},
+note= {Accessed: 2024-06-04}
+}
+
+% TensorBoard
+@misc{tensorboard,
+  title = {TensorBoard: Visualization Toolkit for Machine Learning Experimentation},
+  author = {{TensorFlow}},
+  year = {2024},
+  howpublished = {\url{https://www.tensorflow.org/tensorboard}},
+  note = {Accessed: 2024-05-20}
+}
+
+% Netron
+@misc{netron,
+  title = {Netron: Neural Network and Machine Learning Model Visualizer},
+  author = {{Lutz Roeder}},
+  year = {2024},
+  howpublished = {\url{https://netron.app}},
+  note = {Accessed: 2024-05-20}
+}
+
+@misc{Tensorflowdocs,
+  title =  {Tensorflow API documentation},
+  author = {Google},
+  year = {2024},
+  howpublished = {\url{https://www.tensorflow.org/api_docs/python/tf}},
+  lastaccessed = {May 12, 2024}
+}
+
+@inproceedings{weimisuseapi2024,
+author = {Wei, Moshi and Harzevili, Nima Shiri and Huang, Yuekai and Yang, Jinqiu and Wang, Junjie and Wang, Song},
+title = {Demystifying and Detecting Misuses of Deep Learning APIs},
+year = {2024},
+isbn = {9798400702174},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3597503.3639177},
+doi = {10.1145/3597503.3639177},
+abstract = {Deep Learning (DL) libraries have significantly impacted various domains in computer science over the last decade. However, developers often face challenges when using the DL APIs, as the development paradigm of DL applications differs greatly from traditional software development. Existing studies on API misuse mainly focus on traditional software, leaving a gap in understanding API misuse within DL APIs. To address this gap, we present the first comprehensive study of DL API misuse in TensorFlow and PyTorch. Specifically, we first collected a dataset of 4,224 commits from the top 200 most-starred projects using these two libraries and manually identified 891 API misuses. We then investigated the characteristics of these misuses from three perspectives, i.e., types, root causes, and symptoms. We have also conducted an evaluation to assess the effectiveness of the current state-of-the-art API misuse detector on our 891 confirmed API misuses. Our results confirmed that the state-of-the-art API misuse detector is ineffective in detecting DL API misuses. To address the limitations of existing API misuse detection for DL APIs, we propose LLMAPIDet, which leverages Large Language Models (LLMs) for DL API misuse detection and repair. We build LLMAPIDet by prompt-tuning a chain of ChatGPT prompts on 600 out of 891 confirmed API misuses and reserve the rest 291 API misuses as the testing dataset. Our evaluation shows that LLMAPIDet can detect 48 out of the 291 DL API misuses while none of them can be detected by the existing API misuse detector. We further evaluate LLMAPIDet on the latest versions of 10 GitHub projects. The evaluation shows that LLMAPIDet can identify 119 previously unknown API misuses and successfully fix 46 of them.},
+booktitle = {Proceedings of the IEEE/ACM 46th International Conference on Software Engineering},
+articleno = {201},
+numpages = {12},
+keywords = {API misuse, deep learning APIs, empirical study, detection},
+location = {<conf-loc>, <city>Lisbon</city>, <country>Portugal</country>, </conf-loc>},
+series = {ICSE '24}
+}
+
+@misc{tensorflowtfrawopimmutableconst,
+  title = {tf.raw\_ops.ImmutableConst API},
+  author = {{TensorFlow}},
+  year = {2024},
+  howpublished = {\url{https://tensorflow.google.cn/api_docs/python/tf/raw_ops/ImmutableConst}},
+  note = {Accessed: 2024-05-20}
+}
+@misc{pybind11,
+author = {Wenzel Jakob and Jason Rhinelander and Dean Moldovan},
+year = {2016},
+note = {\url{https://github.com/pybind/pybind11}},
+title = {pybind11 -- Seamless operability between C++11 and Python}
+}
+
+@inproceedings{Lattner2004LLVM,
+  author = {Chris Lattner and Vikram Adve},
+  title = {LLVM: A Compilation Framework for Lifelong Program Analysis \& Transformation},
+  booktitle = {Proceedings of the International Symposium on Code Generation and Optimization (CGO)},
+  year = {2004},
+  pages = {75--86},
+  doi = {10.1109/CGO.2004.1281665},
+  url = {https://llvm.org/pubs/2004-01-30-CGO-LLVM.html}
+}
+
+@misc{ClangAST,
+  author = {Clang Project},
+  title = {Clang: A C Language Family Frontend for LLVM},
+  year = {2024},
+  howpublished = {\url{https://clang.llvm.org}},
+  note = {Accessed: 2024-05-30}
+}
+
+@misc{CodeQL,
+  author = {{GitHub}},
+  title = {CodeQL: Discover vulnerabilities across a codebase},
+  year = {2024},
+  url = {https://codeql.github.com/},
+  note = {Accessed: 2024-05-22}
+}
+
+@article{hu1999calculating,
+  title={Calculating an optimal homomorphic algorithm for bracket matching},
+  author={Hu, Zhenjiang and Takeichi, Masato},
+  journal={Parallel processing letters},
+  volume={9},
+  number={03},
+  pages={335--345},
+  year={1999},
+  publisher={World Scientific}
+}
+@article{liu2021generated,
+  title={Generated knowledge prompting for commonsense reasoning},
+  author={Liu, Jiacheng and Liu, Alisa and Lu, Ximing and Welleck, Sean and West, Peter and Bras, Ronan Le and Choi, Yejin and Hajishirzi, Hannaneh},
+  journal={arXiv preprint arXiv:2110.08387},
+  year={2021}
+}
+
+@article{giray2023prompt,
+  title={Prompt engineering with ChatGPT: a guide for academic writers},
+  author={Giray, Louie},
+  journal={Annals of biomedical engineering},
+  volume={51},
+  number={12},
+  pages={2629--2633},
+  year={2023},
+  publisher={Springer}
+}
+
+@inproceedings{kuppa2023chain,
+  title={Chain of reference prompting helps llm to think like a lawyer},
+  author={Kuppa, Aditya and Rasumov-Rahe, Nikon and Voses, Marc},
+  booktitle={Generative AI+ Law Workshop},
+  year={2023}
+}
+
+@article{wang2020generalizing,
+  title={Generalizing from a few examples: A survey on few-shot learning},
+  author={Wang, Yaqing and Yao, Quanming and Kwok, James T and Ni, Lionel M},
+  journal={ACM computing surveys (csur)},
+  volume={53},
+  number={3},
+  pages={1--34},
+  year={2020},
+  publisher={ACM New York, NY, USA}
+}
