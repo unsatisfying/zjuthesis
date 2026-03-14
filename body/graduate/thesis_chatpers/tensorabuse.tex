@@ -331,7 +331,7 @@ API 覆盖数量 & 1083  & 1083 &  100\\
 \renewcommand{\arraystretch}{1.25}
 \centering
 \small
-\caption{构造攻击原语的 API 及其描述表（\ding{172}- ModelScan 检测，\ding{173}- Huggingface 检测，\ding{174}- TensorFlow Hub 检测，$\Circle$ -可以绕过检测，$\RIGHTcircle$ -导致中度警告，$\Circle$ -导致高度警告）}
+\caption{构造攻击原语的 API 及其描述表（\ding{172}-ModelScan 检测，\ding{173}-Huggingface 检测，\ding{174}-TensorFlow Hub 检测，$\Circle$-可以绕过检测，$\RIGHTcircle$-导致中度警告，$\Circle$-导致高度警告）}
 \label{tab:primitives}
 \begin{tabular}{c|l|l|ccc}
 \hline
@@ -348,26 +348,26 @@ API 覆盖数量 & 1083  & 1083 &  100\\
   \textbf{\ding{173}} &
   \textbf{\ding{174}} \\\hline
                                                                                           & \cellcolor[HTML]{FFFFFF}raw\_ops.ReadFile                                             & \cellcolor[HTML]{FFFFFF}读取特定文件 & \cellcolor[HTML]{FFFFFF}$\CIRCLE$    & \cellcolor[HTML]{FFFFFF}$\Circle$      & \cellcolor[HTML]{FFFFFF}$\Circle$                             \\
-                                                                                          & \cellcolor[HTML]{C0C0C0}raw\_ops.LookupTableExport(V2)                                             & \cellcolor[HTML]{C0C0C0}从文件中读取键值对 & \cellcolor[HTML]{C0C0C0}$\Circle$    & \cellcolor[HTML]{C0C0C0}$\Circle$      & \cellcolor[HTML]{C0C0C0}$\Circle$ \\
+                                                                                          & \cellcolor[HTML]{EFEFEF}raw\_ops.LookupTableExport(V2)                                             & \cellcolor[HTML]{EFEFEF}从文件中读取键值对 & \cellcolor[HTML]{EFEFEF}$\Circle$    & \cellcolor[HTML]{EFEFEF}$\Circle$      & \cellcolor[HTML]{EFEFEF}$\Circle$ \\
                                                                                           & \cellcolor[HTML]{FFFFFF}raw\_ops.FixedLengthRecordDataset(V2)                         & \cellcolor[HTML]{FFFFFF}以固定长度读取文件   & $\Circle$     & $\Circle$     &$\Circle$                \\
-                                                                                          & \cellcolor[HTML]{C0C0C0}raw\_ops.CSVDataset(V2)                                       & \cellcolor[HTML]{C0C0C0}读取csv文件     & \cellcolor[HTML]{C0C0C0}$\Circle$     & \cellcolor[HTML]{C0C0C0}$\Circle$     & \cellcolor[HTML]{C0C0C0}$\Circle$                     \\
+                                                                                          & \cellcolor[HTML]{EFEFEF}raw\_ops.CSVDataset(V2)                                       & \cellcolor[HTML]{EFEFEF}读取csv文件     & \cellcolor[HTML]{EFEFEF}$\Circle$     & \cellcolor[HTML]{EFEFEF}$\Circle$     & \cellcolor[HTML]{EFEFEF}$\Circle$                     \\
                                                                                           & \cellcolor[HTML]{FFFFFF}raw\_ops.ExperimentalCSVDataset                               & \cellcolor[HTML]{FFFFFF}读取csv文件     & $\Circle$     & $\Circle$     & $\Circle$                     \\
-                                                                                          & \cellcolor[HTML]{C0C0C0}raw\_ops.ImmutableConst                                       & \cellcolor[HTML]{C0C0C0}读取文件的ASCII码    & \cellcolor[HTML]{C0C0C0}$\Circle$     & \cellcolor[HTML]{C0C0C0}$\Circle$     & \cellcolor[HTML]{C0C0C0}$\Circle$      \\
+                                                                                          & \cellcolor[HTML]{EFEFEF}raw\_ops.ImmutableConst                                       & \cellcolor[HTML]{EFEFEF}读取文件的ASCII码    & \cellcolor[HTML]{EFEFEF}$\Circle$     & \cellcolor[HTML]{EFEFEF}$\Circle$     & \cellcolor[HTML]{EFEFEF}$\Circle$      \\
 \multirow{-7}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}任意\\ 文件读\end{tabular}}}  & \cellcolor[HTML]{FFFFFF}raw\_ops.InitializeTableFromTextFile(V2)                      & \cellcolor[HTML]{FFFFFF}读取键值对类型文件         & $\Circle$    & $\Circle$     & $\Circle$               \\ \hline
-                                                                                          & \cellcolor[HTML]{C0C0C0}raw\_ops.WriteFile                                            & \cellcolor[HTML]{C0C0C0}创建并向文件中覆盖写   & \cellcolor[HTML]{C0C0C0}$\CIRCLE$  & \cellcolor[HTML]{C0C0C0}$\Circle$ &\cellcolor[HTML]{C0C0C0}$\Circle$   \\
+                                                                                          & \cellcolor[HTML]{EFEFEF}raw\_ops.WriteFile                                            & \cellcolor[HTML]{EFEFEF}创建并向文件中覆盖写   & \cellcolor[HTML]{EFEFEF}$\CIRCLE$  & \cellcolor[HTML]{EFEFEF}$\Circle$ &\cellcolor[HTML]{EFEFEF}$\Circle$   \\
                                                                                           & \cellcolor[HTML]{FFFFFF}raw\_ops.SaveSlices                                            & \cellcolor[HTML]{FFFFFF}创建并向文件中写张量   & \cellcolor[HTML]{FFFFFF}$\Circle$  & \cellcolor[HTML]{FFFFFF}$\Circle$ &\cellcolor[HTML]{FFFFFF}$\Circle$   \\
                                                                                           
-                                                                                          & \cellcolor[HTML]{C0C0C0}raw\_ops.Save(V2)                                             & \cellcolor[HTML]{C0C0C0}创建并向文件中写数据集  & \cellcolor[HTML]{C0C0C0}$\Circle$     & \cellcolor[HTML]{C0C0C0}$\Circle$     & \cellcolor[HTML]{C0C0C0}$\Circle$   \\
+                                                                                          & \cellcolor[HTML]{EFEFEF}raw\_ops.Save(V2)                                             & \cellcolor[HTML]{EFEFEF}创建并向文件中写数据集  & \cellcolor[HTML]{EFEFEF}$\Circle$     & \cellcolor[HTML]{EFEFEF}$\Circle$     & \cellcolor[HTML]{EFEFEF}$\Circle$   \\
 \multirow{-4}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}任意\\ 文件写\end{tabular}}} & \cellcolor[HTML]{FFFFFF}raw\_ops.PrintV2                                              & \cellcolor[HTML]{FFFFFF}向文件末尾添加内容     & \cellcolor[HTML]{FFFFFF}$\Circle$     & \cellcolor[HTML]{FFFFFF}$\Circle$     & \cellcolor[HTML]{FFFFFF}$\Circle$       \\ \hline
-                                                                                          & \cellcolor[HTML]{C0C0C0}raw\_ops.MatchingFiles                                        & \cellcolor[HTML]{C0C0C0}获取特定格式的文件路径 & \cellcolor[HTML]{C0C0C0}$\Circle$  & \cellcolor[HTML]{C0C0C0}$\Circle$                   & \cellcolor[HTML]{C0C0C0}$\Circle$ \\
+                                                                                          & \cellcolor[HTML]{EFEFEF}raw\_ops.MatchingFiles                                        & \cellcolor[HTML]{EFEFEF}获取特定格式的文件路径 & \cellcolor[HTML]{EFEFEF}$\Circle$  & \cellcolor[HTML]{EFEFEF}$\Circle$                   & \cellcolor[HTML]{EFEFEF}$\Circle$ \\
                                                                                           & \cellcolor[HTML]{FFFFFF}raw\_ops.ExperimentalMatchingFilesDataset                     & \cellcolor[HTML]{FFFFFF}获取特定格式的文件路径 & \cellcolor[HTML]{FFFFFF}$\Circle$  & \cellcolor[HTML]{FFFFFF}$\Circle$                   \cellcolor[HTML]{FFFFFF}& \cellcolor[HTML]{FFFFFF}$\Circle$ \\
-\multirow{-3}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}目录\\ 读取\end{tabular}}}       & \cellcolor[HTML]{C0C0C0}raw\_ops.MatchingFilesDataset                                 & \cellcolor[HTML]{C0C0C0}获取特定格式的文件路径  & \cellcolor[HTML]{C0C0C0}$\Circle$  & \cellcolor[HTML]{C0C0C0}$\Circle$                   & \cellcolor[HTML]{C0C0C0}$\Circle$\\ \hline
+\multirow{-3}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}目录\\ 读取\end{tabular}}}       & \cellcolor[HTML]{EFEFEF}raw\_ops.MatchingFilesDataset                                 & \cellcolor[HTML]{EFEFEF}获取特定格式的文件路径  & \cellcolor[HTML]{EFEFEF}$\Circle$  & \cellcolor[HTML]{EFEFEF}$\Circle$                   & \cellcolor[HTML]{EFEFEF}$\Circle$\\ \hline
                                                                                           & \cellcolor[HTML]{FFFFFF}raw\_ops.DebugIdentity(V2,V3)                                 & \cellcolor[HTML]{FFFFFF}向任意IP地址发送张量             & \cellcolor[HTML]{FFFFFF}$\Circle$  & \cellcolor[HTML]{FFFFFF}$\Circle$                   \cellcolor[HTML]{FFFFFF}& \cellcolor[HTML]{FFFFFF}$\Circle$ \\
-                                                                                          & \cellcolor[HTML]{C0C0C0}raw\_ops.DistributedSave                                      & \cellcolor[HTML]{C0C0C0}向任意IP地址发送数据集             & \cellcolor[HTML]{C0C0C0}$\Circle$  & \cellcolor[HTML]{C0C0C0}$\Circle$                   & \cellcolor[HTML]{C0C0C0}$\Circle$  \\
+                                                                                          & \cellcolor[HTML]{EFEFEF}raw\_ops.DistributedSave                                      & \cellcolor[HTML]{EFEFEF}向任意IP地址发送数据集             & \cellcolor[HTML]{EFEFEF}$\Circle$  & \cellcolor[HTML]{EFEFEF}$\Circle$                   & \cellcolor[HTML]{EFEFEF}$\Circle$  \\
                                                                                           & \cellcolor[HTML]{FFFFFF}raw\_ops.RegisterDataset(V2)                                  & \cellcolor[HTML]{FFFFFF}向任意IP地址发注册请求      & \cellcolor[HTML]{FFFFFF}$\Circle$  & \cellcolor[HTML]{FFFFFF}$\Circle$                   \cellcolor[HTML]{FFFFFF}& \cellcolor[HTML]{FFFFFF}$\Circle$ \\
-                                                                                          & \cellcolor[HTML]{C0C0C0}rpc.kernels.gen\_rpc\_ops.rpc\_call   & \cellcolor[HTML]{C0C0C0}向任意IP地址发送字符串     & \cellcolor[HTML]{C0C0C0}$\RIGHTcircle$   & \cellcolor[HTML]{C0C0C0}$\Circle$  & \cellcolor[HTML]{C0C0C0}$\Circle$        \\
+                                                                                          & \cellcolor[HTML]{EFEFEF}rpc.kernels.gen\_rpc\_ops.rpc\_call   & \cellcolor[HTML]{EFEFEF}向任意IP地址发送字符串     & \cellcolor[HTML]{EFEFEF}$\RIGHTcircle$   & \cellcolor[HTML]{EFEFEF}$\Circle$  & \cellcolor[HTML]{EFEFEF}$\Circle$        \\
 \multirow{-5}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}网络\\ 发送\end{tabular}}}         & \cellcolor[HTML]{FFFFFF}raw\_ops.DataServiceDataset(V2,V3,V4)                         & \cellcolor[HTML]{FFFFFF}向任意IP地址发数据请求                   & \cellcolor[HTML]{FFFFFF}$\Circle$  & \cellcolor[HTML]{FFFFFF}$\Circle$                   \cellcolor[HTML]{FFFFFF}& \cellcolor[HTML]{FFFFFF}$\Circle$ \\ \hline
-\textbf{\begin{tabular}[c]{@{}c@{}}网络\\ 接收\end{tabular}}                        & \cellcolor[HTML]{C0C0C0}rpc.kernels.gen\_rpc\_ops.rpc\_client & \cellcolor[HTML]{C0C0C0}从远端服务器接收消息      & \cellcolor[HTML]{C0C0C0}$\RIGHTcircle$    & \cellcolor[HTML]{C0C0C0}$\Circle$                   & \cellcolor[HTML]{C0C0C0}$\Circle$             \\ \hline
+\textbf{\begin{tabular}[c]{@{}c@{}}网络\\ 接收\end{tabular}}                        & \cellcolor[HTML]{EFEFEF}rpc.kernels.gen\_rpc\_ops.rpc\_client & \cellcolor[HTML]{EFEFEF}从远端服务器接收消息      & \cellcolor[HTML]{EFEFEF}$\RIGHTcircle$    & \cellcolor[HTML]{EFEFEF}$\Circle$                   & \cellcolor[HTML]{EFEFEF}$\Circle$             \\ \hline
 \end{tabular}
 \end{table}
 \subsection{攻击原语构建}
@@ -436,12 +436,13 @@ API 覆盖数量 & 1083  & 1083 &  100\\
   \textbf{ModelScan} &
   \textbf{Huggingface} &
   \textbf{Tensorflow Hub} \\ \hline
-File leak           &\ding{182}(\ding{186\ding{185}})\ding{184}\ding{185}&$\Circle$    &$\Circle$  &$\Circle$            \\ 
+文件泄漏          &\ding{182}(\ding{186\ding{185}})\ding{184}\ding{185}&$\Circle$    &$\Circle$  &$\Circle$            \\ 
+\rowcolor[HTML]{EFEFEF}
+IP地址暴露         &\ding{185}&$\Circle$    &$\Circle$  &$\Circle$            \\ 
 
-IP exposure         &\ding{185}&$\Circle$    &$\Circle$  &$\Circle$            \\ 
-
-Code execution   &(\ding{184})\ding{183}&$\Circle$    &$\Circle$  &$\Circle$            \\ 
-Shell Access        &\ding{184}\ding{183}(\ding{186})\ding{185}&$\Circle$    &$\Circle$  &$\Circle$                      \\ \hline
+代码执行   &(\ding{184})\ding{183}&$\Circle$    &$\Circle$  &$\Circle$            \\
+\rowcolor[HTML]{EFEFEF} 
+Shell获取        &\ding{184}\ding{183}(\ding{186})\ding{185}&$\Circle$    &$\Circle$  &$\Circle$                      \\ \hline
 \end{tabular}
 \vspace{+10pt}
 \end{table}
@@ -451,7 +452,7 @@ Shell Access        &\ding{184}\ding{183}(\ding{186})\ding{185}&$\Circle$    &$\
 
 表~\ref{tab:primitives}和表~\ref{tab:attacks_evaluation}描述了使用 API 和原语构造的 TensorAbuse 攻击及其在不同平台和工具检测结果。结果表明，所有 API 和实际攻击都可以绕过 Hugging Face Hub 的恶意软件检测机制，所构建的模型没有被标记为恶意，也没有发出警告~\cite{huggingface2021malware}。对于TensorFlow Hub，并没有发现任何表明其存在检测机制的报道和官方文档，并且在上传模型两周后，没有发出任何警告。这表明在 TensorFlow Hub 上缺乏恶意模型的检测和人工审核机制。ModelScan 作为最先进的恶意模型检测工具，本研究发现其在检测 TensorFlow 模型方面仍然存在局限性。尽管它将包含 \code{ReadFile} 和  \code{WriteFile} API 的模型标记为高风险，但 TensorAbuse 攻击仍然可以通过将这些 API 替换为具有类似功能的其他 API 例如 \code{raw_ops.ImmutableConst} 和 \code{raw_ops.PrintV2}，从而逃避检测。
 
-\begin{figure}[!t]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.95\linewidth]{figure/API_across_version.png}
     % \vspace{5pt}
