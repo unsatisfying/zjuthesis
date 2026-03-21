@@ -153,7 +153,7 @@ numpages = {37},
 keywords = {Empirical studies, Vulnerabilities, Packages, PyPi, Python}
 }
 
-@ARTICLE{bogaerts2024taxonomy,
+@ARTICLE{bogaerts2024python,
   author={Bogaerts, Frédéric C. G. and Ivaki, Naghmeh and Fonseca, José},
   journal={IEEE Open Journal of the Computer Society}, 
   title={A Taxonomy for Python Vulnerabilities}, 
@@ -1701,3 +1701,104 @@ series = {CCS '18}
   note         = {Accessed May 30, 2025},
   institution  = {PyTorch GitHub Repository}
 }
+
+@misc{huntr_report_2026,
+  title = {Remote Code Execution via Insecure Pickle Deserialization in TransitionParser in nltk/nltk},
+  author = {{Huntr}},
+  year = {2026},
+  month = feb,
+  day = 12,
+  howpublished = {\url{https://huntr.com/bounties/752084b6-8a8a-47f1-a491-331abc817b5b}},
+  note = {Status: Duplicate}
+}
+
+@misc{penligent_article_2025,
+  title = {Deep Dive into Deserialization: Vulnerability Causes, Penetration Testing, and Security Defense},
+  author = {{Penligent}},
+  year = {2025},
+  month = oct,
+  day = 11,
+  howpublished = {\url{https://www.penligent.ai/hackinglabs/deep-dive-into-deserialization-vulnerability-causes-penetration-testing-and-security-defense/}},
+  note = {Tool ID: 19}
+}
+
+@misc{huntr_platform_2024,
+  title = {Huntr - The world's first bug bounty platform for AI/ML},
+  author = {{Huntr}},
+  year = {2024},
+  url = {https://huntr.com/bounties/7b111d55-8215-4727-8807-c5ed4cf1bfbe},
+  note = {Accessed: 2026-03-20}
+}
+
+@article{Dong2026LowRC,
+  title={Low Rank Comes with Low Security: Gradient Assembly Poisoning Attacks against Distributed LoRA-based LLM Systems},
+  author={Yueyan Dong and Minghui Xu and Qin Hu and Yinhao Xiao and Qi Luo and Yechao Zhang and Yue Zhang and Xiuzhen Cheng},
+  journal={ArXiv},
+  year={2026},
+  volume={abs/2601.00566},
+  url={https://api.semanticscholar.org/CorpusID:284475265}
+}
+@inproceedings{dong2024trojaningplugins,
+  author       = {Tian Dong and Minhui Xue and Guoxing Chen and Rayne Holland and Yan Meng and Shaofeng Li and Zhen Liu and Haojin Zhu},
+  title        = {The Philosopher’s Stone: Trojaning Plugins of Large Language Models},
+  booktitle    = {Network and Distributed System Security Symposium, {NDSS} 2025},
+  publisher    = {The Internet Society},
+  year         = {2025},
+}
+
+@inproceedings{jin2026exploiting,
+  title = {Exploiting {TLBs} in Virtualized {GPUs} for Cross-{VM} Side-Channel Attacks},
+  author = {Jin, Hongyue and Guo, Yanan and Zhang, Zhenkai},
+  year = {2026},
+  booktitle = {Proceedings of the 33rd Network and Distributed System Security (NDSS) Symposium},
+  address = {San Diego, California, USA},
+  month = {2},
+  note = {Accepted for publication; conference dates: 23-27 February 2026}
+}
+
+@inproceedings{li2023empirical,
+author = {Jia, Li and Zhong, Hao and Wang, Xiaoyin and Huang, Linpeng and Lu, Xuansheng},
+title = {An Empirical Study on Bugs Inside TensorFlow},
+year = {2020},
+isbn = {978-3-030-59409-1},
+publisher = {Springer-Verlag},
+address = {Berlin, Heidelberg},
+url = {https://doi.org/10.1007/978-3-030-59410-7_40},
+doi = {10.1007/978-3-030-59410-7_40},
+abstract = {In recent years, deep learning has become a hot research topic. Although it achieves incredible positive results in some scenarios, bugs inside deep learning software can introduce disastrous consequences, especially when the software is used in safety-critical applications. To understand the bug characteristic of deep learning software, researchers have conducted several empirical studies on deep learning bugs. Although these studies present useful findings, we notice that none of them analyze the bug characteristic inside a deep learning library like TensorFlow. We argue that some fundamental questions of bugs in deep learning libraries are still open. For example, what are the symptoms and the root causes of bugs inside TensorFlow, and where are they? As the underlying library of many deep learning projects, the answers to these questions are useful and important, since its bugs can have impacts on many deep learning projects. In this paper, we conduct the first empirical study to analyze the bugs inside a typical deep learning library, i.e., TensorFlow. Based on our results, we summarize 5 findings, and present our answers to 2 research questions. For example, we find that the symptoms and root causes of TensorFlow bugs are more like ordinary projects (e.g., Mozilla) than other machine learning libraries (e.g., Lucene). As another example, we find that most TensorFlow bugs reside in its interfaces (26.24\%), learning algorithms (11.79\%), and how to compile (8.02\%), deploy (7.55\%), and install (4.72\%) TensorFlow across platforms.},
+booktitle = {Database Systems for Advanced Applications: 25th International Conference, DASFAA 2020, Jeju, South Korea, September 24–27, 2020, Proceedings, Part I},
+pages = {604–620},
+numpages = {17},
+location = {Jeju, Korea (Republic of)}
+}
+
+@inproceedings{Christou2023ivysyn,
+author = {Christou, Neophytos and Jin, Di and Atlidakis, Vaggelis and Ray, Baishakhi and Kemerlis, Vasileios P.},
+title = {IvySyn: automated vulnerability discovery in deep learning frameworks},
+year = {2023},
+isbn = {978-1-939133-37-3},
+publisher = {USENIX Association},
+address = {USA},
+abstract = {We present IvySyn, the first fully-automated framework for discovering memory error vulnerabilities in Deep Learning (DL) frameworks. IvySyn leverages the statically-typed nature of native APIs in order to automatically perform type-aware mutation-based fuzzing on low-level kernel code. Given a set of offending inputs that trigger memory safety (and runtime) errors in low-level, native DL (C/C++) code, IvySyn automatically synthesizes code snippets in high-level languages (e.g., in Python), which propagate error-triggering input via high(er)-level APIs. Such code snippets essentially act as "Proof of Vulnerability", as they demonstrate the existence of bugs in native code that an attacker can target through various high-level APIs. Our evaluation shows that IvySyn significantly outperforms past approaches, both in terms of efficiency and effectiveness, in finding vulnerabilities in popular DL frameworks. Specifically, we used IvySyn to test Tensor-Flow and PyTorch. Although still an early prototype, IvySyn has already helped the TensorFlow and PyTorch framework developers to identify and fix 61 previously-unknown security vulnerabilities, and assign 39 unique CVEs.},
+booktitle = {Proceedings of the 32nd USENIX Conference on Security Symposium},
+articleno = {134},
+numpages = {18},
+location = {Anaheim, CA, USA},
+series = {SEC '23}
+}
+
+@INPROCEEDINGS {Zhang2025fix,
+author = { Zhang, Kunpeng and Wang, Shuai and Han, Jitao and Zhu, Xiaogang and Li, Xian and Wang, Shaohua and Wen, Sheng },
+booktitle = { 2025 IEEE/ACM 47th International Conference on Software Engineering (ICSE) },
+title = {{ Your Fix Is My Exploit: Enabling Comprehensive DL Library API Fuzzing with Large Language Models }},
+year = {2025},
+volume = {},
+ISSN = {},
+pages = {3110-3122},
+abstract = { Deep learning (DL) libraries are widely used to form the basis of various AI applications in computer vision, natural language processing, and software engineering domains. Despite their popularity, DL libraries are known to have vulnerabilities, such as buffer overflows, use-after-free, and integer overflows, that can be exploited to compromise the security or effectiveness of the underlying libraries. While traditional fuzzing techniques have been used to find bugs in software, they are not well-suited for DL libraries. In general, the complexity of DL libraries and the diversity of their APIs make it challenging to test them thoroughly. To date, mainstream DL libraries like TensorFlow and PyTorch have featured over 1,000 APIs, and the number of APIs is still growing. Fuzzing all these APIs is a daunting task, especially when considering the complexity of the input data and the diversity of the API usage patterns. Recent advances in large language models (LLMs) have illustrated the high potential of LLMs in understanding and synthesizing human-like code. Despite their high potential, we find that emerging LLM-based fuzzers are less optimal for DL library API fuzzing, given their lack of in-depth knowledge on API input edge cases and inefficiency in generating test inputs. In this paper, we propose DFuzz, a LLM-driven DL library fuzzing approach. We have two key insights: (1) With high reasoning ability, LLMs can replace human experts to reason edge cases (likely error-triggering inputs) from checks in an API's code, and transfer the extracted knowledge to test other (new or rarely-tested) APIs. (2) With high generation ability, LLMs can synthesize initial test programs with high accuracy that automates API testing. DFuzz provides LLMs with a novel “white-box view” of DL library APIs, and therefore, can leverage LLMs' reasoning and generation abilities to achieve comprehensive fuzzing. Our experimental results on popular DL libraries demonstrate that DFuzz is able to cover more APIs than SOTA (LLM-based) fuzzers on TensorFlow and PyTorch, respectively. Moreover, DFuzz successfully detected 37 bugs, with 8 already fixed and 19 replicated by the developer but still under investigation. },
+keywords = {Codes;Large language models;Computer bugs;Fuzzing;Libraries;Cognition;Complexity theory;Software engineering;Glass box;Testing},
+doi = {10.1109/ICSE55347.2025.00041},
+url = {https://doi.ieeecomputersociety.org/10.1109/ICSE55347.2025.00041},
+publisher = {IEEE Computer Society},
+address = {Los Alamitos, CA, USA},
+month =May}
