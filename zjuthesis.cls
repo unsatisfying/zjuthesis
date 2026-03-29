@@ -90,7 +90,7 @@
         {
             % thesis or design
             \newcommand{\TitleTypeName}{浙江大学博士学位论文}
-            \newcommand{\TitleTypeNameCover}{博士学位论文}
+            \newcommand{\TitleTypeNameCover}{博士专业学位论文}
         }
         {}
     }

@@ -22,7 +22,7 @@
 \end{figure}
 
 \textbf{依赖解析的复杂性和动态性。}
-在上述两个供应链过程共同导致了 AI 软件的依赖关系网络结构复杂、层级深度极深的特点，这种依赖关系通常以依赖图的形式进行建模。如图~\ref{fig:albumentationsx_dependency_graph} 所示，albumentationsx v2.0.13 版本的依赖图，其直接依赖于 5 个第三方组件，这些组件又进一步引入 7 个间接依赖~\cite{albumentationsx-repo}。
+在上述两个供应链过程共同导致了 AI 软件的依赖关系网络结构复杂、层级深度极深的特点，这种依赖关系通常以依赖图的形式进行建模。如图~\ref{fig:albumentationsx_dependency_graph} 所示是 albumentationsx v2.0.13 版本的依赖图，其直接依赖于 5 个第三方组件，这些组件又进一步引入 7 个间接依赖~\cite{albumentationsx-repo}。
 %
 此外，在依赖图中，一个软件包通常只对应一个特定版本，但在如 JavaScript 这种语言生态，同一依赖图中可能会包含同一组件的多个版本，这是其依赖安装过程的目录树决定的。另外，使得依赖图更复杂的是，每一个软件包既可能作为直接依赖被上层软件引入，也可能是上层软件的间接依赖。例如，图中 numpy v2.2.6 软件既是 albumentationsx v2.0.13 的直接依赖，同时其也是经由 scipy v1.16.3 引入的间接依赖。
 %
