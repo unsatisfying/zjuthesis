@@ -1,4 +1,4 @@
-\chapter{AI 系统供应链背景知识}
+\chapter{AI 异构系统供应链背景知识}
 当今社会，AI 技术已经获得了绝对的重视和长足的发展，并且被用在生活中的各个重要领域，甚至成为各个国家之间的核心竞争力。在这一发展过程中，AI 技术已经从传统的模型设计与调优转变为由多项基础设施构成的大型 AI 系统。前者往往仅关注单一的推理计算模型，不仅数据量和参数是轻量级的，用户与其交互的方式也是通过简单的应用接入；相反后者是在一系列复杂的设施上共同运作的结果，不仅包括了软件应用，还适配了负责模型加速运行的调度的框架以及给模型底层运行加速的 GPU 硬件等。而这样一个复杂的 AI 系统，其各个组件的开发、模型的训练和部署，往往都高度依赖于第三方开源软件包或者第三方开源模型库，而底层的硬件运行也往往依赖于厂商不开源的驱动和固件。这些供应链侧的威胁不仅引入了大量新型的攻击向量，更是能够对 AI 系统造成严重的威胁。本章首先对 AI 系统供应链的整体架构进行梳理，从软件应用层、模型框架层以及硬件加速层三个关键层级出发，介绍各个层级的供应链基本组成，功能职责以及所面临的威胁，接着介绍目前不同层级的学术界和工业界对 AI 系统供应链层面的研究现状。
 
 \section{软件应用层背景知识}
@@ -152,7 +152,7 @@ NVIDIA GPU 推出了 CUDA 编程平台，允许用户编写自己的 CUDA kernel
 
 在 GPU 架构分析方面，研究者通过微架构测试与逆向工程方法，对 GPU 内部实现进行了深入探索。Jia 等人率先对 NVIDIA Volta 架构 GPU 的缓存层次结构与访存机制进行了系统性的分析，随后他们又扩展至 Turing 架构~\cite{jia2018dissecting,jia2019dissecting}。后续又有多项工作采用类似方法对 NVIDIA 不同代 GPU 架构进行逆向分析，旨在理解其内部设计与安全边界~\cite{abdelkhalik2022demystifying, jarmusch2025dissecting, luo2025dissecting}。
 
-在漏洞利用方面，针对 GPU 的攻击研究主要集中于侧信道（Side-Channel Attacks,SCA）与隐蔽信道攻击 （Covert Channel Attack,CCA）。Naghibijouybari 等人首次证明，基于 OpenGL 或 CUDA 的间谍程序可以通过 GPU 侧信道提取网页指纹、用户交互行为，甚至恢复其他 CUDA 应用中神经网络模型的内部参数~\cite{naghibijouybari2018rendered}。Zhang 等人进一步逆向了 Ampere 架构 GPU 的页表实现细节和多级缓存的实现细节，并指出在多实例 GPU 特性（Multi-Instance GPU, MIG）场景下，由于他们仍 L3 Cache 导致存在跨实例侧信道风险~\cite{zhang2023t}。Nayak 等人利用统一虚拟内存（Unified Virtual Memory, UVM）和快表 （Translation Lookaside Buffer, TLB） 机制，在 GPU 上构建隐蔽信道，实现了对 GPU 加速数据库应用数据的泄漏~\cite{nayak2021mis}。此外，Dutta 等人利用 GPU 与 CPU 之间共享缓存与总线的特性，在 Intel 平台上构建了高带宽隐蔽信道，进一步拓展了跨硬件组件攻击的可能性~\cite{dutta2021leakybuddies}。
+在漏洞利用方面，针对 GPU 的攻击研究集中于侧信道（Side-Channel Attacks,SCA）与隐蔽信道攻击 （Covert Channel Attack,CCA）。Naghibijouybari 等人首次证明，基于 OpenGL 或 CUDA 的间谍程序可以通过 GPU 侧信道提取网页指纹、用户交互行为，甚至恢复其他 CUDA 应用中神经网络模型的内部参数~\cite{naghibijouybari2018rendered}。Zhang 等人进一步逆向了 Ampere 架构 GPU 的页表实现细节和多级缓存的实现细节，并指出在多实例 GPU 特性（Multi-Instance GPU, MIG）场景下，由于他们仍 L3 Cache 导致存在跨实例侧信道风险~\cite{zhang2023t}。Nayak 等人利用统一虚拟内存（Unified Virtual Memory, UVM）和快表 （Translation Lookaside Buffer, TLB） 机制，在 GPU 上构建隐蔽信道，实现了对 GPU 加速数据库应用数据的泄漏~\cite{nayak2021mis}。此外，Dutta 等人利用 GPU 与 CPU 之间共享缓存与总线的特性，在 Intel 平台上构建了高带宽隐蔽信道，进一步拓展了跨硬件组件攻击的可能性~\cite{dutta2021leakybuddies}。
 
 在内存漏洞分析方面，已有研究揭示了 GPU 内存管理机制中存在的多种安全隐患。Guo 等人对 NVIDIA GPU 上的越界访问（Out Of Bound, OOB）漏洞进行了系统性分析，证实了 GPU 上 OOB BUG 利用的可能性，他们还对 GPU 栈内存布局进行了逆向工程~\cite{yanan:profit_for_fun}。Mittal 等人对 GPU 漏洞进行了全面综述，从数据泄露、侧信道与隐蔽信道等角度对攻击模式进行了系统分类~\cite{mittal2018survey}。Miele 等人利用 GPU 上的栈溢出漏洞劫持函数指针，并分析了在 GPU 环境中实施返回导向编程攻击（Return-Oriented Programming, ROP）的可行性~\cite{miele2016buffer}。此外，Park 等人提出的 \code{Mind Control} 攻击通过操纵 GPU 设备内存和固定 CUDA 库地址干扰深度学习系统推理过程~\cite{park2020mind}；Sorensen 等人提出的 \code{LeftoverLocals} 攻击，利用未初始化的 GPU 局部内存实现跨进程或跨容器的数据恢复，他们的研究恢复了 Apple、Qualcomm 和 AMD 等厂商的 GPU 上的局部内存数据，对其他用户的交互式大语言模型会话进行窃听~\cite{tyler2024leftoverlocals}。Roels 等人进一步研究了 GPU 内存中的 ROP 小组件，并提出了绕过 NVIDIA 将返回地址存储在寄存器中的防御机制的组合式攻击方法~\cite{returning_exploits2025}。
 
